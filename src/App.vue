@@ -25,6 +25,6 @@
   }
 </script>
 
-<style lang="less">
-  @import "assets/css/base.less";
+<style lang="scss">
+  @import "assets/css/base";
 </style>

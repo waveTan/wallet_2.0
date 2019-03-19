@@ -6,5 +6,11 @@ module.exports = {
       localeDir: 'locales',
       enableInSFC: false
     }
+  },
+  devServer: {
+    port: 8085,
+    host: '0.0.0.0',
+    https: false, // https:{type:Boolean}
+    open: true, //配置自动启动浏览器
   }
 };

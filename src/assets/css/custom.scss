@@ -1,0 +1,20 @@
+// custom.scss
+$grid-breakpoints: (
+        xs: 0,
+        sm: 480px,
+        md: 640px,
+        lg: 992px,
+        xl: 1200px
+);
+
+.navbar-nav {
+  .b-nav-dropdown {
+    .dropdown-menu{
+      .dropdown-item{
+        @media screen and (max-width: 1000px) {
+          padding: 0 0.5rem;
+        }
+      }
+    }
+  }
+}

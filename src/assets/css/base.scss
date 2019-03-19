@@ -1,0 +1,211 @@
+@import "style";
+@import "custom";
+@import "https://at.alicdn.com/t/font_690985_8kxng02atd.css";
+
+* html .clearfix {
+  height: 1%
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: $Acolor;
+}
+
+body, div, dl, dt, dd, ul, ol, li, p, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea {
+  margin: 0;
+  padding: 0;
+  font-family: $fontF, sans-serif;
+  color: $Fcolour;
+  font-weight: 400
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset, img {
+  border: 0;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+q:before, q:after {
+  content: ' '
+}
+
+a {
+  text-decoration: none;
+  color: $Acolor;
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a:hover {
+  text-decoration: none
+}
+
+a:focus {
+  outline: none;
+}
+
+.tl {
+  text-align: left;
+}
+
+.tc {
+  text-align: center;
+}
+
+.tr {
+  text-align: right;
+}
+
+.fw {
+  font-weight: bold
+}
+
+.fl {
+  float: left;
+  display: inline;
+}
+
+.fr {
+  float: right;
+  display: inline;
+}
+
+.cb {
+  clear: both;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.none {
+  display: none;
+}
+
+.pc {
+  @media screen and (max-width: 1000px) {
+    display: none;
+  }
+}
+
+.mobile {
+  display: none;
+  @media screen and (max-width: 1000px) {
+    display: block;
+  }
+}
+
+.w1200 {
+  max-width: 1200px;
+  margin: 0 auto;
+  @media screen and (max-width: 1000px) {
+    width: 100%;
+  }
+}
+
+.font10 {
+  font-size: 10px;
+  line-height: 10px;
+}
+
+.font12 {
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.font14 {
+  font-size: 14px;
+  @media screen and (max-width: 1000px) {
+    font-size: 0.7rem;
+  }
+}
+
+.font16 {
+  font-size: 16px;
+  line-height: 16px;
+}
+
+.font18 {
+  font-size: 18px;
+  line-height: 18px;
+  @media screen and (max-width: 1000px) {
+    font-size: 0.9rem;
+    line-height: 0.9rem;
+  }
+}
+
+.font20 {
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.font24 {
+  font-size: 24px;
+  line-height: 24px;
+  @media screen and (max-width: 1000px) {
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+  }
+}
+
+.font30 {
+  font-size: 30px;
+  line-height: 30px;
+  @media screen and (max-width: 1000px) {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+  }
+}
+
+.fW400 {
+  font-weight: 400;
+}
+
+.fW600 {
+  font-weight: 600;
+}
+
+.fCN {
+  color: $Ncolour;
+}
+
+.fwhite {
+  color: #FFFFFF;
+}
+
+.fred {
+  color: #F1313C;
+}
+
+.yellow {
+  color: #FD9D2D;
+}
+
+.gray {
+  color: #A4AEC4;
+}
+
+.bg-white {
+  background-color: $Acolor;
+}
+
+.bg-gray {
+  background-color: $Mcolour;
+}
+
+
