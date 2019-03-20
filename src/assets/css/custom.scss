@@ -6,15 +6,73 @@ $grid-breakpoints: (
         lg: 992px,
         xl: 1200px
 );
+p {
+  margin: 0;
+}
 
 .navbar-nav {
   .b-nav-dropdown {
-    .dropdown-menu{
-      .dropdown-item{
+    .dropdown-menu {
+      .dropdown-item {
         @media screen and (max-width: 1000px) {
           padding: 0 0.5rem;
         }
       }
+    }
+  }
+}
+
+.nav-tabs {
+  .nav-link {
+    border: 0 !important;
+    color: $Fcolour;
+  }
+  .active {
+    background: transparent !important;
+    color: $Ncolour !important;
+  }
+}
+
+.select {
+  margin: 10px 0;
+  @media (max-width: 768px) {
+    margin: 0.5rem 0 0.5rem 1rem;
+  }
+  .btn {
+    background: $Mcolour;
+    color: $Fcolour;
+    text-align: left;
+    border-radius: 2px;
+    border-color: $Dcolour;
+    &:after {
+      margin: 0 0 0 60px;
+    }
+  }
+}
+
+.hide_switches{
+  width: 200px;
+  float: right;
+  text-align: right;
+  margin: 20px 0 0 0;
+  line-height: 25px;
+}
+
+
+.table{
+  th{
+    vertical-align: bottom !important;
+    padding: 0.5rem !important;
+    text-align: center;
+  }
+  td{
+    vertical-align: unset !important;
+    padding: 0.25rem !important;
+    line-height: 2rem !important;
+    height: 2rem;
+    text-align: center;
+    p{
+      margin: 0;
     }
   }
 }

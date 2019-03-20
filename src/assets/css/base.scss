@@ -205,7 +205,33 @@ a:focus {
 }
 
 .bg-gray {
-  background-color: $Mcolour;
+  background-color: $Acolor;
+}
+
+.address_title{
+  width: 100%;
+  height: 110px;
+  line-height: 110px;
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+  span{
+    font-size: 16px;
+  }
+  i{
+    color: $Ccolour;
+    cursor:pointer;
+  }
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    height: 5rem;
+    line-height: 5rem;
+    span{
+      font-size: 0.7rem;
+    }
+    i{}
+  }
+
 }
 
 
