@@ -20,16 +20,15 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="less">
   @import "./../assets/css/style";
-
   .bottom {
     height: 60px;
-    border-top: 1px solid $Acolor;
+    border-top: 1px solid @Acolor;
     position: fixed;
     line-height: 60px;
     bottom: 0;
-    background-color: $Mcolour;
+    background-color: @Mcolour;
     width: 100%;
     @media screen and (max-width: 1000px) {
       height: 4rem;

@@ -1,6 +1,9 @@
 <template>
   <div class="header">
-    <b-navbar toggleable="lg">
+
+
+
+   <!-- <b-navbar toggleable="lg">
       <b-navbar-brand>
         <img class="logo click" :src=logoSvg>
       </b-navbar-brand>
@@ -15,7 +18,7 @@
           <b-nav-item @click="toNav('contract')" :class="navActive ==='contract' ? 'active':''">合约</b-nav-item>
           <b-nav-item @click="toNav('application')" :class="navActive ==='application' ? 'active':''">应用</b-nav-item>
         </b-navbar-nav>
-        <!-- Right aligned nav items -->
+        &lt;!&ndash; Right aligned nav items &ndash;&gt;
         <b-navbar-nav class="ml-auto">
           <b-nav-item-dropdown>
             <template slot="button-content"><i class="iconfont icon-zhanghu_icon"></i></template>
@@ -44,7 +47,7 @@
 
         </b-navbar-nav>
       </b-collapse>
-    </b-navbar>
+    </b-navbar>-->
   </div>
 
 </template>
@@ -53,7 +56,6 @@
   import * as config from '../config.js'
   import logo from './../assets/img/logo.svg'
   import testnetLogo from './../assets/img/logo-test-black.svg'
-
   export default {
     data() {
       return {
@@ -65,12 +67,10 @@
     },
     components: {},
     created() {
-
     },
     mounted() {
     },
     methods: {
-
       /**
        * 菜单导航
        * @param name
@@ -88,11 +88,10 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="less">
   @import "./../assets/css/style";
-
   .header {
-    border-bottom: 1px solid $Mcolour;
+    border-bottom: 1px solid @Mcolour;
     .navbar {
       max-width: 1200px;
       margin: 0 auto;

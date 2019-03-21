@@ -12,7 +12,6 @@
 <script>
   import HeaderBar from './components/HeaderBar'
   import BottomBar from './components/BottomBar'
-
   export default {
     components: {
       HeaderBar,
@@ -21,10 +20,15 @@
     created() {
 
     },
-    methods: {}
+    methods: {
+
+    }
   }
 </script>
 
-<style lang="scss">
-  @import "assets/css/base";
+<style lang="less">
+  @import "assets/css/base.less";
+  .app{
+    background-color: #ffffff;
+  }
 </style>
