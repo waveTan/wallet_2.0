@@ -1,53 +1,49 @@
 <template>
   <div class="header">
+    <div class="w1200">
+      <div class="logo">
+        <img class="click" :src=logoSvg>
+      </div>
+      <div class="nav">
+        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
+          <el-menu-item index="1">钱包</el-menu-item>
+          <el-menu-item index="2">转账</el-menu-item>
+          <el-menu-item index="3">共识</el-menu-item>
+          <el-menu-item index="4">合约</el-menu-item>
+         <!-- <el-menu-item index="5">应用</el-menu-item>-->
+          <el-submenu index="5">
+            <template slot="title">应用</template>
+            <el-menu-item index="2-1">应用1</el-menu-item>
+            <el-menu-item index="2-2">应用2</el-menu-item>
+            <el-menu-item index="2-3">应用3</el-menu-item>
+          </el-submenu>
+        </el-menu>
+      </div>
+      <div class="tool">
+        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
+          <el-submenu index="21">
+            <template slot="title"><i class="el-icon-share"></i></template>
+            <el-menu-item index="2-1"><i class="el-icon-check"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
+            <el-menu-item index="2-2"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
+            <el-menu-item index="2-3"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
+          </el-submenu>
+          <el-submenu index="22">
+            <template slot="title">设置</template>
+            <el-menu-item index="2-1">系统设置</el-menu-item>
+            <el-menu-item index="2-2">服务节点</el-menu-item>
+          </el-submenu>
+          <el-submenu index="23">
+            <template slot="title">Eng</template>
+            <el-menu-item index="中文">中文</el-menu-item>
+            <el-menu-item index="English">English</el-menu-item>
+          </el-submenu>
+          <li class="el-menu-item">|</li>
+          <el-menu-item index="24">帮助</el-menu-item>
+        </el-menu>
 
-
-
-   <!-- <b-navbar toggleable="lg">
-      <b-navbar-brand>
-        <img class="logo click" :src=logoSvg>
-      </b-navbar-brand>
-
-      <b-navbar-toggle target="nav_collapse"/>
-
-      <b-collapse is-nav id="nav_collapse">
-        <b-navbar-nav>
-          <b-nav-item @click="toNav('wallet')" :class="navActive ==='wallet' ? 'active':''">钱包</b-nav-item>
-          <b-nav-item @click="toNav('transfer')" :class="navActive ==='transfer' ? 'active':''">转账</b-nav-item>
-          <b-nav-item @click="toNav('consensus')" :class="navActive ==='consensus' ? 'active':''">共识</b-nav-item>
-          <b-nav-item @click="toNav('contract')" :class="navActive ==='contract' ? 'active':''">合约</b-nav-item>
-          <b-nav-item @click="toNav('application')" :class="navActive ==='application' ? 'active':''">应用</b-nav-item>
-        </b-navbar-nav>
-        &lt;!&ndash; Right aligned nav items &ndash;&gt;
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown>
-            <template slot="button-content"><i class="iconfont icon-zhanghu_icon"></i></template>
-            <b-dropdown-item class="small"><i class="iconfont icon-weituoxinxi"></i> Nse8qUCgvTj4taDt4jqZQbo3EqjMWaVe(bolang)</b-dropdown-item>
-            <b-dropdown-item class="small"><i class="iconfont"></i> Nse8qUCgvTj4taDt4jqZQbo3EqjMWaVe(wave)</b-dropdown-item>
-            <b-dropdown-item class="small"><i class="iconfont"></i> Nse8qUCgvTj4taDt4jqZQbo3EqjMWaVe(wave88)</b-dropdown-item>
-          </b-nav-item-dropdown>
-
-          <b-nav-item-dropdown text="设置" right>
-            <b-dropdown-item href="#">EN</b-dropdown-item>
-            <b-dropdown-item href="#">ES</b-dropdown-item>
-          </b-nav-item-dropdown>
-
-          <b-nav-item-dropdown text="Lang" right>
-            <b-dropdown-item href="#">EN</b-dropdown-item>
-            <b-dropdown-item href="#">ES</b-dropdown-item>
-          </b-nav-item-dropdown>
-
-          <b-nav-item>
-            <span class="pc">|</span>
-          </b-nav-item>
-
-          <b-nav-item>
-            <span>帮助</span>
-          </b-nav-item>
-
-        </b-navbar-nav>
-      </b-collapse>
-    </b-navbar>-->
+      </div>
+    </div>
+    <div class="cb"></div>
   </div>
 
 </template>
@@ -56,13 +52,14 @@
   import * as config from '../config.js'
   import logo from './../assets/img/logo.svg'
   import testnetLogo from './../assets/img/logo-test-black.svg'
+
   export default {
     data() {
       return {
         //logo
         logoSvg: config.RUN_DEV ? logo : testnetLogo,
         //菜单选中
-        navActive: 'wallet'
+        navActive: '1',
       };
     },
     components: {},
@@ -73,15 +70,11 @@
     methods: {
       /**
        * 菜单导航
-       * @param name
+       * @param key
+       * @param keyPath
        */
-      toNav(name) {
-        this.navActive = name;
-        if(name ==='contract' ){
-          this.$router.push({
-            name: 'contract',
-          })
-        }
+      handleSelect(key, keyPath) {
+        console.log(key, keyPath);
       }
     },
     watch: {}
@@ -90,14 +83,29 @@
 
 <style lang="less">
   @import "./../assets/css/style";
+
   .header {
-    border-bottom: 1px solid @Mcolour;
-    .navbar {
-      max-width: 1200px;
-      margin: 0 auto;
-      .logo {
-        width: 5.5rem;
+    border-bottom: 1px solid @Dcolour;
+    height: 80px;
+    .logo {
+      width: 120px;
+      float: left;
+      img{
+        margin: 20px 0 0 0;
+        width: 100%;
       }
+    }
+    .nav {
+      width: 600px;
+      margin: 10px 0 0 0;
+      float: left;
+    }
+    .tool{
+      width: 340px;
+      margin: 10px 0 0 0;
+      float: right;
+      background-color: #e6a23c;
+
     }
   }
 </style>

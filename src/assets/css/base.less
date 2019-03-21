@@ -18,7 +18,7 @@ body, div, dl, dt, dd, ul, ol, li, p, h1, h2, h3, h4, h5, h6, pre, form, fieldse
   margin: 0;
   padding: 0;
   font-family: @fontF, sans-serif;
-  color: @Acolor;
+  color: @Fcolour;
   font-weight: 400
 }
 
@@ -46,7 +46,7 @@ q:before, q:after {
 
 a {
   text-decoration: none;
-  color: @Acolor;
+  color: @Fcolour;
   outline: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -96,13 +96,14 @@ a:focus {
 .none {
   display: none;
 }
-.pc{
+
+.pc {
   @media screen and (max-width: 1000px) {
     display: none;
   }
 }
 
-.mobile{
+.mobile {
   display: none;
   @media screen and (max-width: 1000px) {
     display: block;
@@ -182,7 +183,7 @@ a:focus {
 }
 
 .fwhite {
-  color: #FFFFFF;
+  color: @Bcolour;
 }
 
 .fred {
@@ -198,68 +199,11 @@ a:focus {
 }
 
 .bg-white {
-  background-color: @Bcolour1;
-}
-
-.bg-gray {
-  background-color: @Bcolour2;
-}
-
-.title {
-  margin: 40px auto;
-  @media screen and (max-width: 1000px) {
-    margin: 1rem 0 0 0;
-    padding: 0 0 0 0.5rem;
-  }
-}
-
-//滑块开关
-.hide-switch {
-  text-align: right;
-  margin: 70px 0 0 0;
-  @media screen and (max-width: 1000px) {
-    margin: 2rem 0.5rem 0 0;
-  }
-}
-
-.tabs {
-  position: relative;
-  margin: -24px auto 0;
-}
-
-.tabs-top {
-  margin: -24px auto 0;
-}
-
-.tabs_header {
-  height: 48px;
-  line-height: 48px;
   background-color: @Bcolour;
 }
 
-.tabs_infos {
-  height: 40px;
-  line-height: 40px;
-  color: @Mcolour;
-}
-
-//表格标题文字
-.tabs_title {
-  font-size: 16px;
-  font-weight: bold;
-  color: @Mcolour;
-}
-
-//表格列表标题文字
-.tabs_title1 {
-  font-size: 14px;
-  color: @Acolor3;
-}
-
-//表格文字内容
-.tabs_info {
-  font-size: 14px;
-  color: @Mcolour;
+.bg-gray {
+  background-color: @Bcolour1;
 }
 
 /**可点击的手指样式**/
@@ -318,176 +262,31 @@ a:focus {
   margin-bottom: 100px
 }
 
-.cards {
-  .cards-ul {
-    .cards-li {
-      width: 285px;
-      height: 80px;
-      border: @BD1;
-      background-color: @Bcolour;
-      margin: 0 20px 0 0;
-      &:last-child {
-        margin-right: 0;
-      }
-      h6 {
-        padding: 10px 0 13px 10px;
-        margin: 0;
-        line-height: normal;
-        color: @Acolor3;
-      }
-      h5{
-        font-size: 20px;
-        line-height: 20px;
-      }
-      @media screen and (max-width: 1000px) {
-        width: 45%;
-        float: left;
-        margin: 0 2.5% 0.5rem;
-        h5{
-          font-size: 1rem;
-          line-height: 1rem;
-        }
-      }
-    }
-  }
-}
-
-.b-info, .info_tabs {
-  @media screen and (max-width: 1000px) {
-    width: 95%;
-  }
-  h3 {
-    margin: -25px 0 0 0;
-    padding: 0 0 0 30px;
-    border: @BD1;
-    @media screen and (max-width: 1000px) {
-      padding: 0 0 0 1rem;
-    }
-  }
-  .ul {
-    padding: 5px 0 5px;
-    min-height: 100px;
-    border-right: @BD1;
-    border-left: @BD1;
-    border-bottom: @BD1;
-    background-color: @Bcolour1;
-    @media screen and (max-width: 1000px) {
-      padding: 0.5rem 0 0;
-    }
-    .tabs_infos {
-      width: 599px;
-      border-right: @BD1;
-      padding:0 20px 0;
-      font-size: 14px;
-      @media screen and (max-width: 1000px) {
-        width: 90%;
-        float: none;
-        border-right: 0;
-        padding: 0;
-      }
-      &:nth-child(2n) {
-        border-right: 0;
-      }
-      p{
-        color: @Acolor3;
-        margin:0;
-        border-bottom: @BD1;
-        padding: 0 20px;
-        @media screen and (max-width: 1000px) {
-          padding: 0 1rem;
-        }
-        span {
-          float: right;
-          color: @Acolor;
-          @media screen and (max-width: 1000px) {
-            text-align: right;
-          }
-        }
-        .click{
-          color: @Ccolour;
-        }
-      }
-      &:last-child{
-        p{
-          border-bottom: 0;
-        }
-      }
-      &:nth-last-child(2){
-        p{
-          border-bottom: 0;
-          @media screen and (max-width: 1000px) {
-            border-bottom: 1px solid #DFE4EF
-          }
-        }
-      }
-
-    }
-    .tabs_infos_long {
-      width: 49%;
-      border-right: 0;
-      p{
-        span {
-          float: none;
-          display: block;
-          margin: -40px -29px 0px 80px;
-          height: 40px;
-        }
-      }
-
-    }
-  }
-
-  h4 {
-    margin: 30px 0 0 0;
-    border-bottom: @BD1;
-    padding-bottom: 14px;
-    @media screen and (max-width: 1000px) {
-      margin: 1.5rem 0 0 0;
-      padding: 0 0 0.3rem 1rem;
-    }
-  }
-  .select {
-    margin: 20px 0 14px 0;
-    @media screen and (max-width: 1000px) {
-      margin: 1rem 0 0.7rem 1rem;
-    }
-  }
-  .info_table {
-    //border: @BD1;
-  }
-}
-
-.btn {
+.title {
+  background-color: @Bcolour;
+  text-align: center;
+  height: 100px;
+  line-height: 100px;
+  font-size: 18px;
   span {
-    color: @Acolor;
+    font-size: 14px;
+  }
+  i {
+    font-size: 20px;
+    color: @Ccolour;
+    margin: 0 0 0 10px;
   }
 }
 
-.btn_N {
-  span {
-    color: @Ncolour;
+.pages {
+  margin: 20px 0 0 0;
+  .page-total {
+    font-size: 14px;
+    float: left;
+  }
+  .el-pagination {
   }
 }
-
-
-.scroll {
-  &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar {
-    width: 8px;
-    background-color: #dfe4ed;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background-image: -webkit-gradient(linear, 20% 0%, 20% 0%, from(#d1dbe5), to(#d1dbe5), color-stop(.2, #ffffff))
-  }
-}
-
 
 
 

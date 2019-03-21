@@ -2,12 +2,12 @@
   <div class="bottom">
     <div class="w1200 font14">
       <div class="left fl">
-        <p class="fl">节点服务器:http://apiserver.nuls.io</p>
+        <p class="fl">节点服务器: <u class="clicks">http://apiserver.nuls.io</u></p>
         <p class="fr">高度:节点131000000/主网 13112323</p>
       </div>
       <div class="right fr">
-        <label>服务协议</label>
-        <label>隐私政策</label>
+        <label class="clicks">服务协议</label>
+        <label class="clicks">隐私政策</label>
         <label>V1.6.1</label>
       </div>
     </div>
@@ -24,11 +24,11 @@
   @import "./../assets/css/style";
   .bottom {
     height: 60px;
-    border-top: 1px solid @Acolor;
+    border-top: 1px solid @Dcolour;
     position: fixed;
     line-height: 60px;
     bottom: 0;
-    background-color: @Mcolour;
+    background-color: @Bcolour;
     width: 100%;
     @media screen and (max-width: 1000px) {
       height: 4rem;
@@ -38,6 +38,7 @@
     .w1200 {
       .left {
         width: 50%;
+        line-height: 60px;
         @media screen and (max-width: 1000px) {
           width: 100%;
           margin: 0.5rem 0 0 0.5rem;
@@ -50,6 +51,7 @@
       }
       .right {
         width: 40%;
+        line-height: 60px;
         text-align: right;
         @media screen and (max-width: 1000px) {
           width: 100%;
