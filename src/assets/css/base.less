@@ -1,6 +1,6 @@
 @import "style";
 @import "el-index";
-@import "https://at.alicdn.com/t/font_982342_syb88rpei9.css";
+@import "https://at.alicdn.com/t/font_690985_8kxng02atd.css";
 
 * html .clearfix {
   height: 1%
@@ -265,7 +265,7 @@ a:focus {
 .title {
   background-color: @Bcolour;
   text-align: center;
-  height: 100px;
+  height: 120px;
   line-height: 100px;
   font-size: 18px;
   span {
@@ -285,6 +285,59 @@ a:focus {
     float: left;
   }
   .el-pagination {
+  }
+}
+
+.card{
+  .card-info{
+    border: @BD1;
+    border-radius: 2px;
+    h5{
+      line-height: 50px;
+      background-color: @Bcolour1;
+      border-bottom: @BD1;
+      height: 50px;
+      padding: 0 0 0 40px;
+      font-weight: 500;
+      span{
+        margin: 20px 40px 0 0;
+      }
+    }
+    ul{
+      background-color: @Bcolour;
+      padding: 0 40px;
+      li{
+        border-bottom: @BD1;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        &:last-child{
+          border-bottom: 0;
+        }
+        label{
+          float: right;
+          span{
+            margin: 0 0 0 10px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.filter{
+  width: 100%;
+  .el-select{
+    margin: 5px 10px 15px 0;
+  }
+  .el-switch{
+    float: right;
+    margin: 10px 0 0 0;
+  }
+  .search{
+    width: 500px;
+    float: right;
+    margin: 10px 0 0 0;
   }
 }
 

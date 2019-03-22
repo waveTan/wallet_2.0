@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <h3 class="title">TTakMrubBXi998CZgaYdTy2Nrqwd2ptq<span>(wave)</span><i class="el-icon-tickets clicks"></i></h3>
-
+    <h3 class="title">TTakMrubBXi998CZgaYdTy2Nrqwd2ptq<span>(wave)</span><i class="iconfont icon-fuzhi clicks"></i></h3>
     <el-tabs v-model="homeActive" @tab-click="handleClick" class="w1200">
       <el-tab-pane label="资产列表" name="homeFirst">
         <el-select v-model="value" placeholder="资产类型">
@@ -45,21 +44,23 @@
 
       </el-tab-pane>
       <el-tab-pane label="交易列表" name="homeSecond">
-        <el-select v-model="value" placeholder="资产类型" >
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select>
-        <el-select v-model="value" placeholder="资产类型">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select>
-        <el-select v-model="value" placeholder="资产类型">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select>
+        <div class="filter">
+          <el-select v-model="value" placeholder="资产类型" >
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+          <el-select v-model="value" placeholder="资产类型">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+          <el-select v-model="value" placeholder="资产类型">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
 
-        <el-switch v-model="value3" active-text="" inactive-text="隐藏共识奖励">
-        </el-switch>
+          <el-switch v-model="value3" active-text="" inactive-text="隐藏共识奖励">
+          </el-switch>
+        </div>
 
         <el-table :data="tableData" stripe border>
           <el-table-column prop="account" label="资产" align="center">
@@ -146,6 +147,9 @@
 
   .home {
     background-color: @Bcolour1;
+    .title{
+      height: 100px;
+    }
     .el-tabs {
       margin: 30px auto 0;
       .el-select {

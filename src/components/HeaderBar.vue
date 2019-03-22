@@ -6,10 +6,10 @@
       </div>
       <div class="nav">
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
-          <el-menu-item index="1">钱包</el-menu-item>
-          <el-menu-item index="2">转账</el-menu-item>
-          <el-menu-item index="3">共识</el-menu-item>
-          <el-menu-item index="4">合约</el-menu-item>
+          <el-menu-item index="home">钱包</el-menu-item>
+          <el-menu-item index="transfer">转账</el-menu-item>
+          <el-menu-item index="consensus">共识</el-menu-item>
+          <el-menu-item index="contract">合约</el-menu-item>
          <!-- <el-menu-item index="5">应用</el-menu-item>-->
           <el-submenu index="5">
             <template slot="title">应用</template>
@@ -22,7 +22,7 @@
       <div class="tool">
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
           <el-submenu index="21">
-            <template slot="title"><i class="el-icon-share"></i></template>
+            <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
             <el-menu-item index="2-1"><i class="el-icon-check"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
             <el-menu-item index="2-2"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
             <el-menu-item index="2-3"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
@@ -75,6 +75,9 @@
        */
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
+        this.$router.push({
+          name: key
+        })
       }
     },
     watch: {}

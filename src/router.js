@@ -12,9 +12,19 @@ export default new Router({
       component: resolve => require(['@/views/Home.vue'], resolve)
     },
     {
+      path: '/transfer',
+      name: 'transfer',
+      component: resolve => require(['@/views/transfer/transfer.vue'], resolve)
+    },
+    {
+      path: '/consensus',
+      name: 'consensus',
+      component: resolve => require(['@/views/consensus/consensus.vue'], resolve)
+    },
+    {
       path: '/contract',
       name: 'contract',
-      component: resolve => require(['@/views/contract/index.vue'], resolve)
+      component: resolve => require(['@/views/contract/contract.vue'], resolve)
     }
   ]
 })
