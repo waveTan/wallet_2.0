@@ -5,12 +5,11 @@
         <img class="click" :src=logoSvg>
       </div>
       <div class="nav">
-        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
+        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
           <el-menu-item index="home">钱包</el-menu-item>
           <el-menu-item index="transfer">转账</el-menu-item>
           <el-menu-item index="consensus">共识</el-menu-item>
           <el-menu-item index="contract">合约</el-menu-item>
-         <!-- <el-menu-item index="5">应用</el-menu-item>-->
           <el-submenu index="5">
             <template slot="title">应用</template>
             <el-menu-item index="2-1">应用1</el-menu-item>
@@ -20,8 +19,8 @@
         </el-menu>
       </div>
       <div class="tool">
-        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
-          <el-submenu index="21">
+        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
+          <el-submenu index="21" class="user">
             <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
             <el-menu-item index="2-1"><i class="el-icon-check"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
             <el-menu-item index="2-2"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
@@ -93,7 +92,7 @@
     .logo {
       width: 120px;
       float: left;
-      img{
+      img {
         margin: 20px 0 0 0;
         width: 100%;
       }
@@ -103,12 +102,18 @@
       margin: 10px 0 0 0;
       float: left;
     }
-    .tool{
+    .tool {
       width: 340px;
       margin: 10px 0 0 0;
       float: right;
       background-color: #e6a23c;
-
+      .user {
+        .el-submenu__title {
+          .el-icon-arrow-down {
+            margin: 35px 0 0 -16px
+          }
+        }
+      }
     }
   }
 </style>

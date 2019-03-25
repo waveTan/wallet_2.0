@@ -84,14 +84,14 @@
 }
 
 .el-table {
-  th{
+  th {
     background-color: @Bcolour2 !important;
   }
   .el-table__header-wrapper {
     .el-table__header {
-      .has-gutter{
-        tr{
-          th{
+      .has-gutter {
+        tr {
+          th {
             background-color: @Bcolour2;
             border-right: 0;
           }
@@ -99,10 +99,10 @@
       }
     }
   }
-  .el-table__body-wrapper{
-    .el-table__body{
-      tr{
-        td{
+  .el-table__body-wrapper {
+    .el-table__body {
+      tr {
+        td {
           border-right: 0;
           padding: 12px 0;
         }
@@ -111,29 +111,42 @@
   }
 }
 
-.el-input{
-  .el-input__inner{
+.el-input {
+  .el-input__inner {
     height: 32px;
     line-height: 32px;
     border-radius: 2px;
   }
 }
 
-.el-form{
-  .el-form-item{
+.el-form {
+  .el-form-item {
     margin: 0 0 15px 0;
-    .el-form-item__label{
+    .el-form-item__label {
       line-height: 24px;
     }
-    .el-form-item__content{
-      .el-form-item__error{
+    .el-form-item__content {
+      .el-form-item__error {
         padding-top: 0;
       }
     }
   }
 }
 
-
-.el-switch{
-
+.el-switch {
+  .el-switch__label {
+    //color: @Acolor2 !important;
+  }
 }
+
+.pages {
+  margin: 10px 0 10px 0;
+  text-align: right;
+  height: 50px;
+  .el-pager {
+    .active {
+      background-color: @Ncolour !important;
+    }
+  }
+}
+
