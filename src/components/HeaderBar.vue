@@ -25,6 +25,7 @@
             <el-menu-item index="2-1"><i class="el-icon-check"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
             <el-menu-item index="2-2"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
             <el-menu-item index="2-3"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
+            <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>
           <el-submenu index="22">
             <template slot="title">设置</template>

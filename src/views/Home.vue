@@ -24,9 +24,9 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template>
-              <label class="click">转账</label>
-              <span>|</span>
-              <label class="click">收款</label>
+              <label class="click tab_bn">转账</label>
+              <span class="tab_line">|</span>
+              <label class="click tab_bn">收款</label>
             </template>
           </el-table-column>
         </el-table>
@@ -58,7 +58,7 @@
             </el-option>
           </el-select>
 
-          <el-switch v-model="value3" active-text="" inactive-text="隐藏共识奖励">
+          <el-switch v-model="value3" active-text="" inactive-text="隐藏共识奖励" :width="35">
           </el-switch>
         </div>
 
@@ -113,13 +113,7 @@
         ],
         value: '',
         tableData: [
-          {
-            account: 'NULS',
-            type: '基础资产',
-            total: 12345678.123456789,
-            locking: 12345678.12345678,
-            useble: 12345678.12345678
-          },
+          {account: 'NULS', type: '基础资产', total: 12345678.123456789, locking: 12345678.12345678, useble: 12345678.12345678},
           {account: 'WAVE', type: '合约资产', total: 12345678.123456789, locking: 12345678, useble: 12345678.12345678},
           {account: 'TCN', type: '基础资产', total: 12345678, locking: 12345678.12345678, useble: 12345678},
           {account: 'BYV', type: '合约支出', total: 12345678.123456789, locking: 12345678, useble: 12345678.12345678},
@@ -153,7 +147,7 @@
     .el-tabs {
       margin: 30px auto 0;
       .el-select {
-        margin: 5px 0 15px 0;
+        margin: 5px 10px 15px 0;
       }
     }
   }

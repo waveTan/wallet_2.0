@@ -96,15 +96,6 @@
             }
           }
         }
-        .form-next {
-          margin: 50px 0 0 0;
-          .el-form-item__content {
-            text-align: center;
-            .el-button {
-              width: 400px;
-            }
-          }
-        }
       }
     }
   }

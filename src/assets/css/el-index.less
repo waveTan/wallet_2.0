@@ -109,6 +109,16 @@
       }
     }
   }
+
+  .cell{
+    .tab_bn{
+
+    }
+    .tab_line{
+      color: @Dcolour;
+      padding: 0 10px;
+    }
+  }
 }
 
 .el-input {
@@ -131,11 +141,26 @@
       }
     }
   }
+  .form-next {
+    margin: 50px 0 0 0;
+    .el-form-item__content {
+      text-align: center;
+      .el-button {
+        width: 400px;
+      }
+    }
+  }
 }
 
 .el-switch {
   .el-switch__label {
-    //color: @Acolor2 !important;
+
+  }
+}
+.is-checked{
+  .el-switch__core{
+    border-color: @Ncolour !important;
+    background-color: @Ncolour !important;
   }
 }
 
@@ -147,6 +172,70 @@
     .active {
       background-color: @Ncolour !important;
     }
+  }
+}
+
+.btn{
+  text-align: center;
+  .el-button--success,.el-button--text,.el-button--info{
+    width: 400px;
+    margin: 0 auto !important;
+  }
+}
+
+.el-dialog{
+  background-color: @Bcolour2 !important;
+  .el-dialog__header{
+    border-bottom: @BD1;
+    .el-dialog__headerbtn{
+      top: -15px;
+      right: -15px;
+      background-color: @Bcolour;
+      height: 30px;
+      width: 30px;
+      border-radius: 15px;
+      .el-icon-close{
+        font-size: 20px;
+      }
+    }
+  }
+  .el-dialog__body{
+    padding: 30px 20px 0 20px;
+    span{
+      color: #c0c4cc;
+      font-size: 14px;
+    }
+    p{
+      margin: 20px auto;
+      min-height: 80px;
+      width: 100%;
+      word-wrap:break-word;
+      padding: 10px;
+    }
+  }
+  .el-dialog__footer{
+    text-align: center;
+    .el-button--success{
+      width: 400px;
+    }
+  }
+
+}
+
+.el-radio{
+  .el-radio__input{
+
+  }
+  .is-checked {
+    .el-radio__inner{
+      border-color: @Ncolour !important;
+      background: @Ncolour !important;
+    }
+  }
+}
+.is-checked{
+  .el-radio__label{
+    color: @Ncolour !important;
   }
 }
 
