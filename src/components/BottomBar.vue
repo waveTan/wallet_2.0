@@ -2,7 +2,7 @@
   <div class="bottom">
     <div class="w1200 font14">
       <div class="left fl">
-        <p class="fl">节点服务器: <u class="clicks">http://apiserver.nuls.io</u></p>
+        <p class="fl">节点服务器: <u class="clicks" @click="toUrl('nodeService')">http://apiserver.nuls.io</u></p>
         <p class="fr">高度:节点131000000/主网 13112323</p>
       </div>
       <div class="right fr">
@@ -16,7 +16,19 @@
 
 <script>
   export default {
-    name: "bottom-bar"
+    name: "bottom-bar",
+    methods: {
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name){
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
+    }
   }
 </script>
 

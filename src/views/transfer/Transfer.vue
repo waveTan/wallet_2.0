@@ -28,6 +28,13 @@
           <el-input type="textarea" v-model="transferForm.remarks">
           </el-input>
         </el-form-item>
+        <div class="font14">
+          <el-tooltip placement="top">
+            <div slot="content">该手续费值是根据当前NULS网络预估的，实际消耗可能小于该值，多余部分将会通过共识奖励退回</div>
+            <i class="el-icon-warning"></i>
+          </el-tooltip>
+          手续费：0.02 <span class="fCN">NULS</span>
+        </div>
         <el-form-item class="form-next">
           <el-button type="success" @click="submitForm('transferForm')">下一步</el-button>
         </el-form-item>

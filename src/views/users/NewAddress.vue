@@ -68,7 +68,6 @@
 
     </div>
 
-
     <el-dialog title="安全警告" width="40%"
                :visible.sync="centerDialogVisible"
                :close-on-click-modal="false"

@@ -12,9 +12,19 @@ export default new Router({
       component: resolve => require(['@/views/Home.vue'], resolve)
     },
     {
+      path: '/wallet/frozenList',
+      name: 'frozenList',
+      component: resolve => require(['@/views/users/FrozenList.vue'], resolve)
+    },
+    {
       path: '/transfer',
       name: 'transfer',
       component: resolve => require(['@/views/transfer/Transfer.vue'], resolve)
+    },
+    {
+      path: '/transfer/transferInfo',
+      name: 'transferInfo',
+      component: resolve => require(['@/views/transfer/TransferInfo.vue'], resolve)
     },
     {
       path: '/consensus',
@@ -40,6 +50,12 @@ export default new Router({
       path: '/importAddress',
       name: 'importAddress',
       component: resolve => require(['@/views/users/ImportAddress.vue'], resolve)
+    },
+
+    {
+      path: '/nodeService',
+      name: 'nodeService',
+      component: resolve => require(['@/views/set/NodeService.vue'], resolve)
     }
 
 

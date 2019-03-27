@@ -17,7 +17,7 @@
           </el-table-column>
           <el-table-column label="锁定" align="center">
             <template slot-scope="scope">
-              <span class="click ">{{scope.row.locking}}</span>
+              <span class="click" @click="toUrl('frozenList')">{{scope.row.locking}}</span>
             </template>
           </el-table-column>
           <el-table-column prop="useble" label="可用" align="center">
@@ -62,26 +62,25 @@
           </el-switch>
         </div>
 
-        <el-table :data="tableData" stripe border>
-          <el-table-column prop="account" label="资产" align="center">
+        <el-table :data="txListData" stripe border>
+          <el-table-column prop="account" label="资产" align="center" width="100">
           </el-table-column>
-          <el-table-column prop="type" label="类型" align="center">
+          <el-table-column prop="type" label="类型" align="center" width="100">
           </el-table-column>
-          <el-table-column prop="total" label="总额" align="center">
-          </el-table-column>
-          <el-table-column label="锁定" align="center">
+          <el-table-column label="TxID" align="center">
             <template slot-scope="scope">
-              <span class="click ">{{scope.row.locking}}</span>
+              <span class="click " @click="toUrl('transferInfo')">{{scope.row.txid}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="useble" label="可用" align="center">
+          <el-table-column prop="time" label="时间" align="center">
           </el-table-column>
-          <el-table-column fixed="right" label="操作" align="center">
-            <template>
-              <label class="click">转账</label>
-              <span>|</span>
-              <label class="click">收款</label>
-            </template>
+          <el-table-column prop="tAddress" label="交易地址" align="center">
+          </el-table-column>
+          <el-table-column prop="amount" label="金额" align="center">
+          </el-table-column>
+          <el-table-column prop="balance" label="余额" align="center">
+          </el-table-column>
+          <el-table-column prop="state" label="状态" align="center" width="100">
           </el-table-column>
         </el-table>
         <div class="pages">
@@ -106,7 +105,7 @@
     name: 'home',
     data() {
       return {
-        homeActive: 'homeFirst',
+        homeActive: 'homeSecond',
         options: [
           {value: '选项1', label: '普通资产'},
           {value: '选项2', label: '合约资产'}
@@ -119,11 +118,30 @@
           {account: 'BYV', type: '合约支出', total: 12345678.123456789, locking: 12345678, useble: 12345678.12345678},
         ],
         currentPage4: 4,
+
+        txListData:[
+          {account: 'NULS', type: '转账交易', txid: '0020d5bae....ce7c1c3', time:'2019-03-27 11:57:30', tAddress:'TTaysJK...QRNULS',amount:12345678.12345678,balance:12345678.12345678,state:2},
+          {account: 'wave', type: '合约交易', txid: '0020d5bae....ce7c1c3', time:'2019-03-27 11:57:30', tAddress:'TTaysJK...QRNULS',amount:12345678.12345678,balance:12345678.12345678,state:2},
+          {account: 'BTC', type: '共识奖励', txid: '0020d5bae....ce7c1c3', time:'2019-03-27 11:57:30', tAddress:'TTaysJK...QRNULS',amount:12345678.12345678,balance:12345678.12345678,state:2},
+          {account: 'BTT', type: '设置别名', txid: '0020d5bae....ce7c1c3', time:'2019-03-27 11:57:30', tAddress:'TTaysJK...QRNULS',amount:12345678.12345678,balance:12345678.12345678,state:2},
+        ],
         value3: true,
       };
     },
     components: {},
     methods: {
+
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name) {
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
+
       handleClick(tab, event) {
         console.log(tab, event);
       },

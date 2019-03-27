@@ -70,6 +70,10 @@ a:focus {
 .tr {
   text-align: right;
 }
+.td{
+  text-decoration: none;
+  border-bottom:1px solid @Ccolour;
+}
 
 .fw {
   font-weight: bold
@@ -295,21 +299,21 @@ a:focus {
   }
 }
 
+.card-title{
+  line-height: 50px;
+  background-color: @Bcolour1;
+  border-bottom: @BD1;
+  height: 50px;
+  padding: 0 0 0 40px;
+  font-weight: 500;
+  span{
+    margin: 20px 40px 0 0;
+  }
+}
 .card{
   .card-info{
     border: @BD1;
     border-radius: 2px;
-    h5{
-      line-height: 50px;
-      background-color: @Bcolour1;
-      border-bottom: @BD1;
-      height: 50px;
-      padding: 0 0 0 40px;
-      font-weight: 500;
-      span{
-        margin: 20px 40px 0 0;
-      }
-    }
     ul{
       background-color: @Bcolour;
       padding: 0 40px;
@@ -326,6 +330,40 @@ a:focus {
           span{
             margin: 0 0 0 10px;
           }
+        }
+      }
+    }
+  }
+}
+
+.card_long{
+  border: @BD1;
+  border-radius: 2px;
+  ul{
+    background-color: @Bcolour;
+    padding: 0 20px;
+    li{
+      border-top: @BD1;
+      height: 40px;
+      width: 50%;
+      padding: 0 20px;
+      line-height: 40px;
+      font-size: 14px;
+      float: left;
+      border-right: @BD1;
+      &:nth-child(2n){
+        border-right:0
+      }
+      &:first-child{
+        border-top: 0;
+      }
+      &:nth-child(2){
+        border-top: 0;
+      }
+      label{
+        float: right;
+        span{
+          margin: 0 0 0 10px;
         }
       }
     }

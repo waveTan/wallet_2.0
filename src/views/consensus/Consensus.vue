@@ -3,7 +3,7 @@
     <h3 class="title">TTakMrubBXi998CZgaYdTy2Nrqwd2ptq<span>(wave)</span><i class="iconfont icon-fuzhi clicks"></i></h3>
     <div class="card w1200">
       <div class="card-info left fl">
-        <h5 class="font18">我的共识</h5>
+        <h5 class="card-title font18">我的共识</h5>
         <ul>
           <li>总委托 <label class="click">123456.123456<span class="fCN">NULS</span></label></li>
           <li>可用余额 <label>123456.123456<span class="fCN">NULS</span></label></li>
@@ -11,14 +11,13 @@
         </ul>
       </div>
       <div class="card-info right fr">
-        <h5 class="font18">所有共识 <span class="font16 click fr">创建</span></h5>
+        <h5 class="card-title font18">所有共识 <span class="font16 click fr">创建</span></h5>
         <ul>
           <li>共识节点 <label>100</label></li>
           <li>总节点数 <label>1234</label></li>
           <li>总委托量 <label>123456.123456<span class="fCN">NULS</span></label></li>
         </ul>
       </div>
-
     </div>
 
     <div class="cb"></div>
