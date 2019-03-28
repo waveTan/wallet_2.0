@@ -32,6 +32,21 @@ export default new Router({
       component: resolve => require(['@/views/consensus/Consensus.vue'], resolve)
     },
     {
+      path: '/consensus/consensusInfo',
+      name: 'consensusInfo',
+      component: resolve => require(['@/views/consensus/ConsensusInfo.vue'], resolve)
+    },
+    {
+      path: '/consensus/newConsensus',
+      name: 'newConsensus',
+      component: resolve => require(['@/views/consensus/NewConsensus.vue'], resolve)
+    },
+    {
+      path: '/consensus/consensusList',
+      name: 'consensusList',
+      component: resolve => require(['@/views/consensus/ConsensusList.vue'], resolve)
+    },
+    {
       path: '/contract',
       name: 'contract',
       component: resolve => require(['@/views/contract/Contract.vue'], resolve)
