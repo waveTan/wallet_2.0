@@ -3,83 +3,27 @@
     <div class="bg-white">
       <div class="w1200">
         <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包管理</p>
-        <h3 class="title">创建钱包</h3>
+        <h3 class="title">设置别名</h3>
       </div>
     </div>
     <div class="new w1200 mt_20 bg-white">
-      <ul class="step">
-        <li>
-          <p class="dotted Ndotted"></p>
-        </li>
-        <li>
-          <p class="ico"><i class="el-icon-view Ncolor"></i></p>
-          <h6 class="Ncolor">设置密码</h6>
-        </li>
-        <li>
-          <p class="dotted" :class="!isFirst ? 'Ndotted':''"></p>
-        </li>
-        <li>
-          <p class="ico"><i class="el-icon-location-outline" :class="!isFirst ? 'Ncolor':''"></i></p>
-          <h6 :class="!isFirst ? 'Ncolor':''">备份</h6>
-        </li>
-        <li>
-          <p class="dotted"></p>
-        </li>
-      </ul>
-      <div class="cb"></div>
-
-      <div class="w630" v-show="isFirst">
+      <div class="w630">
+        <h3 class="tc mzt_20">{{this.$route.query.address}}</h3>
         <div class="tip bg-gray">
           <p><i></i>请设置密码用以导入账户、转账、参与共识等重要行为验证</p>
           <p><i></i>请认真保存钱包密码，NULS钱包不存储密码，也无法帮您找回，请务必牢记</p>
         </div>
-        <div class="cb"></div>
         <el-form :model="passwordForm" status-icon :rules="passwordRules" ref="passwordForm" class="mb_20">
-          <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="passwordForm.pass" autocomplete="off"></el-input>
+          <el-form-item label="别名" prop="pass">
+            <el-input type="text" v-model="passwordForm.pass" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="passwordForm.checkPass" autocomplete="off"></el-input>
-          </el-form-item>
-          <div class="font12">点击下一步，你已经同意了<span class="click">用户协议</span></div>
           <el-form-item class="form-next">
             <el-button type="success" @click="submitPasswordForm('passwordForm')">下一步</el-button>
-            <el-button type="text" @click="toUrl('importAddress')">导入钱包</el-button>
           </el-form-item>
         </el-form>
       </div>
-
-      <div class="step_tow w630" v-show="!isFirst">
-        <h3 class="title">您的账户地址：<span>{{newAddressInfo.address}}</span><i class="iconfont icon-fuzhi clicks"></i>
-        </h3>
-        <div class="tip bg-gray">
-          <p>请勿遗失！ NULS将无法帮助您找回遗失的密钥</p>
-          <p>请勿向他人分享！ 如在恶意网站使用此文件，您的资金可能面临被盗窃的风险</p>
-          <p>请制作备份！ 以防您的电脑故障</p>
-        </div>
-
-        <div class="btn mb_20">
-          <el-button type="success">Keystore备份</el-button>
-          <el-button type="text" @click="keyDialog=true">明文私钥备份</el-button>
-          <el-button type="info" @click="goWallet">进入钱包</el-button>
-        </div>
-      </div>
-
     </div>
 
-    <el-dialog title="安全警告" width="40%"
-               :visible.sync="keyDialog"
-               :close-on-click-modal="false"
-               :close-on-press-escape="false"
-    >
-      <span>私钥未经加密，备份存在风险，请保存到安全的地方，建议使用Keystore进行备份</span>
-      <p class="bg-white">
-        {{newAddressInfo.pri}}
-      </p>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="success" @click="keyDialog = false">复制</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -101,30 +45,14 @@
           callback();
         }
       };
-      let validatePassTwo = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.passwordForm.pass) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
       return {
-        //第一步
-        isFirst: true,
-        //弹框
-        keyDialog: false,
         passwordForm: {
           pass: '123456asd',
-          checkPass: '123456asd',
+
         },
         passwordRules: {
           pass: [
             {validator: validatePass, trigger: 'blur'}
-          ],
-          checkPass: [
-            {validator: validatePassTwo, trigger: 'blur'}
           ]
         },
         //新建的地址信息
@@ -169,7 +97,6 @@
           pub: this.newAddressInfo.pub,
           alias: '',
           remark: '',
-          selection:true,
         };
         localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
         this.toUrl('home')

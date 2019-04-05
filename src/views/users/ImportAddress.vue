@@ -8,108 +8,142 @@
     </div>
     <div class="w1200 mt_20 bg-white">
       <div class="radio">
-        <el-radio v-model="radio" label="1">Keystore 导入</el-radio>
-        <el-radio v-model="radio" label="2">私钥导入</el-radio>
+        <el-radio v-model="importRadio" label="importKeystore">Keystore 导入</el-radio>
+        <el-radio v-model="importRadio" label="importKey">私钥导入</el-radio>
       </div>
 
-      <div class="btn mb_100"  v-show="radio==='1'">
+      <div class="btn mb_100" v-show="importRadio==='importKeystore'">
         <el-button type="success">选择keystore文件</el-button>
       </div>
 
-      <div class="w630" v-show="radio==='2'">
-        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" class="mb_100" >
-          <el-form-item label="请输入你的私钥:" prop="age">
-            <el-input type="textarea" v-model="ruleForm2.age"></el-input>
+      <div class="w630" v-show="importRadio==='importKey'">
+        <el-form :model="importKeyForm" status-icon :rules="importKeyRules" ref="importKeyForm" class="mb_100">
+          <el-form-item label="请输入你的私钥:" prop="key">
+            <el-input type="textarea" v-model="importKeyForm.key"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="ruleForm2.pass" autocomplete="off"></el-input>
+            <el-input type="password" v-model="importKeyForm.pass" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="ruleForm2.checkPass" autocomplete="off"></el-input>
+            <el-input type="password" v-model="importKeyForm.checkPass" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item class="form-next">
-            <el-button type="success" @click="submitForm('ruleForm2')">导入钱包</el-button>
+            <el-button type="success" @click="submitForm('importKeyForm')">导入钱包</el-button>
           </el-form-item>
         </el-form>
-
-
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
+  import nuls from 'nuls-sdk-js'
+
   export default {
     data() {
-      let checkAge = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('私钥不能为空'));
+      let checkKey = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('私钥不能为空'));
+        } else {
+          callback();
         }
       };
       let validatePass = (rule, value, callback) => {
+        let patrn = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,20}$/;
         if (value === '') {
           callback(new Error('请输入密码'));
+        } else if (!patrn.exec(value)) {
+          callback(new Error('请输入由字母和数字组合的8-20位密码'));
         } else {
-          if (this.ruleForm2.checkPass !== '') {
-            this.$refs.ruleForm2.validateField('checkPass');
+          if (this.importKeyForm.checkPass !== '') {
+            this.$refs.importKeyForm.validateField('checkPass');
           }
           callback();
         }
       };
-      let validatePass2 = (rule, value, callback) => {
+      let validateCheckPass = (rule, value, callback) => {
         if (value === '') {
           callback(new Error('请再次输入密码'));
-        } else if (value !== this.ruleForm2.pass) {
+        } else if (value !== this.importKeyForm.pass) {
           callback(new Error('两次输入密码不一致!'));
         } else {
           callback();
         }
       };
       return {
-        radio: '1',
-        ruleForm2: {
-          pass: '',
-          checkPass: '',
-          age: ''
+        importRadio: 'importKey',
+        importKeyForm: {
+          key: '',
+          pass: '123456asd',
+          checkPass: '123456asd'
         },
-        rules2: {
+        importKeyRules: {
           pass: [
-            { validator: validatePass, trigger: 'blur' }
+            {validator: validatePass, trigger: ['blur', 'change']}
           ],
           checkPass: [
-            { validator: validatePass2, trigger: 'blur' }
+            {validator: validateCheckPass, trigger: ['blur', 'change']}
           ],
-          age: [
-            { validator: checkAge, trigger: 'blur' }
+          key: [
+            {validator: checkKey, trigger: ['blur', 'change']}
           ]
         }
       };
     },
     methods: {
+
+      /**
+       * 私钥导入钱包
+       * @param formName
+       */
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+            this.importWallet()
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
-      }
+
+      /**
+       * 导入
+       */
+      importWallet() {
+        const importAddressInfo = nuls.importByKey(this.importKeyForm.key,this.importKeyForm.pass);
+        let addressInfo = {
+          address: importAddressInfo.address,
+          aesPri: importAddressInfo.aesPri,
+          pub: importAddressInfo.pub,
+          alias: '',
+          remark: '',
+          selection:true,
+        };
+        localStorage.setItem(importAddressInfo.address, JSON.stringify(addressInfo));
+        this.toUrl('home')
+      },
+
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name) {
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
     }
   }
 </script>
 
 <style lang="less">
   @import "./../../assets/css/style";
-  .import_address{
-    .mt_20{
+
+  .import_address {
+    .mt_20 {
       border: @BD1;
-      .radio{
+      .radio {
         width: 300px;
         text-align: center;
         margin: 50px auto;

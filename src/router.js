@@ -66,7 +66,16 @@ export default new Router({
       name: 'importAddress',
       component: resolve => require(['@/views/users/ImportAddress.vue'], resolve)
     },
-
+    {
+      path: '/setAlias',
+      name: 'setAlias',
+      component: resolve => require(['@/views/users/SetAlias.vue'], resolve)
+    },
+    {
+      path: '/editPassword',
+      name: 'editPassword',
+      component: resolve => require(['@/views/users/EditPassword.vue'], resolve)
+    },
     {
       path: '/nodeService',
       name: 'nodeService',

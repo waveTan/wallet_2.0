@@ -9,8 +9,8 @@
           <el-menu-item index="home">钱包</el-menu-item>
           <el-menu-item index="transfer">转账</el-menu-item>
           <el-menu-item index="consensus">共识</el-menu-item>
-          <el-menu-item index="contract">合约</el-menu-item>
-          <el-submenu index="5">
+          <el-menu-item index="contract" disabled>合约</el-menu-item>
+          <el-submenu index="5" disabled>
             <template slot="title">应用</template>
             <el-menu-item index="2-1">应用1</el-menu-item>
             <el-menu-item index="2-2">应用2</el-menu-item>
@@ -22,9 +22,11 @@
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
           <el-submenu index="21" class="user">
             <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
-            <el-menu-item index="2-1"><i class="el-icon-check"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
-            <el-menu-item index="2-2"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
-            <el-menu-item index="2-3"><i class="el-icon-share"></i>TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</el-menu-item>
+
+            <el-menu-item  v-for="item in addressList"  :key="item.address" :index="item.address" >
+              <i class="el-icon-check"></i>
+              {{item.address}}
+            </el-menu-item>
             <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>
           <el-submenu index="22">
@@ -60,14 +62,20 @@
         logoSvg: config.RUN_DEV ? logo : testnetLogo,
         //菜单选中
         navActive: '1',
+        //地址列表
+        addressList:[],
       };
     },
     components: {},
     created() {
+      this.getAddressList();
     },
     mounted() {
+
+      console.log(this.addressList)
     },
     methods: {
+
       /**
        * 菜单导航
        * @param key
@@ -78,7 +86,19 @@
         this.$router.push({
           name: key
         })
-      }
+      },
+
+      /**
+       * 获取账户列表
+       */
+      getAddressList() {
+        this.addressList = [];
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          if (localStorage.getItem(localStorage.key(i)) !== 'SILENT') {
+            this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
+          }
+        }
+      },
     },
     watch: {}
   }
