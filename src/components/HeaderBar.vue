@@ -23,9 +23,9 @@
           <el-submenu index="21" class="user">
             <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
 
-            <el-menu-item  v-for="item in addressList"  :key="item.address" :index="item.address" >
-              <i class="el-icon-check"></i>
-              {{item.address}}
+            <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
+              <i class="el-icon-check" :class="item.selection ? '' : 'transparent' "></i>
+              {{item.address}}<span v-show="item.alias">({{item.alias}})</span>
             </el-menu-item>
             <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>
@@ -63,7 +63,7 @@
         //菜单选中
         navActive: '1',
         //地址列表
-        addressList:[],
+        addressList: [],
       };
     },
     components: {},
@@ -71,8 +71,10 @@
       this.getAddressList();
     },
     mounted() {
-
-      console.log(this.addressList)
+      //console.log(this.addressList)
+      setInterval(() => {
+        this.getAddressList();
+      },500)
     },
     methods: {
 
@@ -82,10 +84,27 @@
        * @param keyPath
        */
       handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-        this.$router.push({
-          name: key
-        })
+        //console.log(key, keyPath);
+        if (key.length > 20) {
+          for (let itmes of this.addressList) {
+            //清除选中
+            if (itmes.selection) {
+              itmes.selection = false;
+              localStorage.setItem(itmes.address, JSON.stringify(itmes))
+            }
+            //添加选中
+            if (itmes.address === keyPath[1]) {
+              itmes.selection = true;
+              localStorage.setItem(itmes.address, JSON.stringify(itmes))
+            }
+          }
+
+        } else {
+          this.$router.push({
+            name: key
+          })
+        }
+
       },
 
       /**
@@ -98,9 +117,17 @@
             this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
           }
         }
+        for (let itmes of this.addressList) {
+          if (itmes.selection) {
+            sessionStorage.clear();
+            sessionStorage.setItem(itmes.address, JSON.stringify(itmes))
+          }
+        }
       },
     },
-    watch: {}
+    watch: {
+
+    }
   }
 </script>
 

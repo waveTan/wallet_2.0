@@ -117,7 +117,7 @@
           pub: importAddressInfo.pub,
           alias: '',
           remark: '',
-          selection:true,
+          selection:false,
         };
         localStorage.setItem(importAddressInfo.address, JSON.stringify(addressInfo));
         this.toUrl('home')

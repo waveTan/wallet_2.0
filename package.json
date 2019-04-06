@@ -12,9 +12,12 @@
     "postuninstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "bignumber.js": "^8.1.1",
+    "copy-to-clipboard": "^3.1.0",
     "element-ui": "^2.4.5",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
+    "moment": "^2.24.0",
     "nuls-sdk-js": "^0.2.1",
     "vue": "^2.6.6",
     "vue-i18n": "^8.0.0",

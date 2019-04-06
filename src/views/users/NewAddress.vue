@@ -169,7 +169,7 @@
           pub: this.newAddressInfo.pub,
           alias: '',
           remark: '',
-          selection:true,
+          selection:false,
         };
         localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
         this.toUrl('home')

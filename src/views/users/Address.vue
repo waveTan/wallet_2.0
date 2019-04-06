@@ -7,24 +7,28 @@
         <i class="el-icon-plus click" @click="toUrl('newAddress')"></i>
       </div>
       <el-table :data="addressList" stripe border>
-        <el-table-column prop="address" label="账户" align="center">
+        <el-table-column prop="address" label="账户" align="center" min-width="200">
+        </el-table-column>
+        <el-table-column prop="balance" label="余额" align="center">
         </el-table-column>
         <el-table-column label="别名" align="center">
           <template slot-scope="scope">
             <span v-show="scope.row.alias !=='' ">{{scope.row.alias}}</span>
-            <span v-show="scope.row.alias ==='' " @click="addAlias(scope.row)"><i
-                    class="el-icon-edit-outline click"></i></span>
+            <span v-show="scope.row.alias ==='' " @click="addAlias(scope.row)">
+              <i class="el-icon-edit-outline click"></i>
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="备注" align="center">
           <template slot-scope="scope">
             <span v-show="scope.row.remark !=='' " @click="editRemark(scope.row)"
                   class="click">{{scope.row.remark}}</span>
-            <span v-show="scope.row.remark ==='' " @click="editRemark(scope.row)"><i
-                    class="el-icon-edit-outline click"></i></span>
+            <span v-show="scope.row.remark ==='' " @click="editRemark(scope.row)">
+              <i class="el-icon-edit-outline click"></i>
+            </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
             <label class="click tab_bn" @click="editPassword(scope.row)">修改密码</label>
             <span class="tab_line">|</span>
@@ -71,6 +75,7 @@
 <script>
   import nuls from 'nuls-sdk-js'
   import Password from './../../components/PasswordBar'
+  import {timesDecimals} from './../../api/util'
 
   export default {
     data() {
@@ -88,6 +93,7 @@
       this.getAddressList();
     },
     mounted() {
+      this.getAddressLists(this.addressList);
     },
     methods: {
 
@@ -101,11 +107,55 @@
             this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
           }
         }
-
-        for(let itme of this.addressList){
-          console.log(itme)
+        //循环账户智能有一个是选中的账户
+        let countSelection = 0;
+        for (let itmes of this.addressList) {
+          if (itmes.selection) {
+            countSelection++;
+            if (countSelection > 1) {
+              itmes.selection = false;
+              localStorage.setItem(itmes.address, JSON.stringify(itmes))
+            }
+          }
         }
+        //一个选中的都没就默认第一个
+        if (countSelection === 0) {
+          this.addressList[0].selection = true;
+          localStorage.setItem(this.addressList[0].address, JSON.stringify(this.addressList[0]))
+        }
+      },
 
+      /**
+       * 获取地址网络信息
+       * @param address
+       **/
+      getAddressInfoByNode(addressInfo) {
+        addressInfo.alias = "";
+        addressInfo.balance = 0;
+        this.$post('/', 'getAccount', [addressInfo.address])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              addressInfo.alias = response.result.alias;
+              addressInfo.balance = timesDecimals(response.result.balance);
+            }
+            localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
+          })
+          .catch((error) => {
+            console.log(error);
+            localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
+          });
+
+      },
+
+      /**
+       * 循环获取账户余额及别名
+       * @param addressList
+       **/
+      async getAddressLists(addressList) {
+        for (let item of addressList) {
+          await this.getAddressInfoByNode(item);
+        }
       },
 
       /**
@@ -114,15 +164,15 @@
        **/
       addAlias(rowInfo) {
         //todo
-        this.toUrl('setAlias',rowInfo.address)
+        this.toUrl('setAlias', rowInfo.address)
       },
 
       /**
        *  修改密码
        * @param rowInfo
        **/
-      editPassword(rowInfo){
-        this.toUrl('editPassword',rowInfo.address)
+      editPassword(rowInfo) {
+        this.toUrl('editPassword', rowInfo.address)
       },
 
       /**
@@ -169,7 +219,7 @@
        * 连接跳转
        * @param name
        */
-      toUrl(name,param) {
+      toUrl(name, param) {
         //console.log(name)
         this.$router.push({
           name: name,
