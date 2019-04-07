@@ -1,27 +1,32 @@
 <template>
   <div class="home">
-    <h3 class="title">{{addressInfo.address}}<span v-show="addressInfo.alias">({{addressInfo.alias}})</span><i
-            class="iconfont icon-fuzhi clicks"></i></h3>
+    <h3 class="title">
+      {{addressInfo.address}}
+      <span v-show="addressInfo.alias">({{addressInfo.alias}})</span>
+      <i class="iconfont icon-fuzhi clicks" @click="copy(addressInfo.address)"></i>
+    </h3>
     <el-tabs v-model="homeActive" @tab-click="handleClick" class="w1200">
       <el-tab-pane label="资产列表" name="homeFirst" v-loading="assetsListLoading">
-        <el-select v-model="value" placeholder="资产类型">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        <el-select v-model="assetsValue" @change="channgeAsesets">
+          <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
 
         <el-table :data="addressAssetsData" stripe border>
           <el-table-column prop="account" label="资产" align="center">
           </el-table-column>
-          <el-table-column prop="type" label="类型" align="center">
+          <el-table-column prop="type" label="类型" align="center" width="150">
           </el-table-column>
-          <el-table-column prop="total" label="总额" align="center">
+          <el-table-column prop="total" label="总额">
           </el-table-column>
-          <el-table-column label="锁定" align="center">
+          <el-table-column label="锁定">
             <template slot-scope="scope">
-              <span class="click" @click="toUrl('frozenList')">{{scope.row.locking}}</span>
+              <span class="click td" @click="toUrl('frozenList')"
+                    v-show="scope.row.locking !== '--' && scope.row.locking !==0 ">{{scope.row.locking}}</span>
+              <span v-show="scope.row.locking === '--' || scope.row.locking ===0">{{scope.row.locking}}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="balance" label="可用" align="center">
+          <el-table-column prop="balance" label="可用">
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template>
@@ -32,10 +37,12 @@
           </el-table-column>
         </el-table>
         <div class="pages">
-          <!--<div class="page-total">显示1-20 共 1000</div>-->
-          <div class="page-total">显示1-20 共 {{addressAssetsData.length}}</div>
-          <el-pagination v-show="addressAssetsData.length > 10" class="fr" background
-                         @size-change="handleSizeChange" @current-change="handleCurrentChange"
+          <div class="page-total">
+            显示 {{pageNumber-1 === 0 ? 1 : (pageNumber-1) *pageSize}}-{{pageNumber*pageSize}}
+            共 {{addressAssetsData.length}}
+          </div>
+          <el-pagination v-show="addressAssetsData.length > pageSize" class="fr" background
+                         @current-change="addressAssetsListPages"
                          layout=" prev, pager, next, jumper"
                          :total="addressAssetsData.length">
           </el-pagination>
@@ -43,57 +50,59 @@
 
       </el-tab-pane>
       <el-tab-pane label="交易列表" name="homeSecond">
-        <div class="filter">
-          <el-select v-model="value" placeholder="资产类型">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select v-model="value" placeholder="资产类型">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select v-model="value" placeholder="资产类型">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
+        <div v-loading="txListDataLoading">
+          <div class="filter">
+            <el-select v-model="assetsValue">
+              <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+            <el-select v-model="typeValue">
+              <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
+            <el-select v-model="inAndOutValue">
+              <el-option v-for="item in inAndOutOptions" :key="item.value" :label="item.label" :value="item.value">
+              </el-option>
+            </el-select>
 
-          <el-switch v-model="value3" active-text="" inactive-text="隐藏共识奖励" :width="35">
-          </el-switch>
+            <el-switch v-model="isHide" active-text="" inactive-text="隐藏共识奖励" :width="35" @change="changeHide">
+            </el-switch>
+          </div>
+          <el-table :data="txListData" stripe border>
+            <el-table-column prop="account" label="资产" align="center" width="100">
+            </el-table-column>
+            <el-table-column prop="type" label="类型" align="center" width="100">
+            </el-table-column>
+            <el-table-column label="TxID" align="center">
+              <template slot-scope="scope">
+                <span class="click " @click="toUrl('transferInfo')">{{scope.row.txid}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="createTime" label="时间" align="center">
+            </el-table-column>
+            <el-table-column prop="tAddress" label="交易地址" align="center">
+            </el-table-column>
+            <el-table-column prop="amount" label="金额" align="center">
+            </el-table-column>
+            <el-table-column prop="balance" label="余额" align="center">
+            </el-table-column>
+            <el-table-column prop="state" label="状态" align="center" width="100">
+            </el-table-column>
+          </el-table>
+          <div class="pages">
+            <div class="page-total">
+              显示 {{pageNumber-1 === 0 ? 1 : (pageNumber-1) *pageSize}}-{{pageNumber*pageSize}}
+              共 {{pageCount}}
+            </div>
+            <el-pagination v-show="pageCount > pageSize" @current-change="txListPages" class="fr"
+                           :current-page="pageNumber"
+                           :page-size="pageSize"
+                           background
+                           layout=" prev, pager, next, jumper"
+                           :total="pageCount">
+            </el-pagination>
+          </div>
         </div>
-
-        <el-table :data="txListData" stripe border>
-          <el-table-column prop="account" label="资产" align="center" width="100">
-          </el-table-column>
-          <el-table-column prop="type" label="类型" align="center" width="100">
-          </el-table-column>
-          <el-table-column label="TxID" align="center">
-            <template slot-scope="scope">
-              <span class="click " @click="toUrl('transferInfo')">{{scope.row.txid}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="时间" align="center">
-          </el-table-column>
-          <el-table-column prop="tAddress" label="交易地址" align="center">
-          </el-table-column>
-          <el-table-column prop="amount" label="金额" align="center">
-          </el-table-column>
-          <el-table-column prop="balance" label="余额" align="center">
-          </el-table-column>
-          <el-table-column prop="state" label="状态" align="center" width="100">
-          </el-table-column>
-        </el-table>
-        <div class="pages">
-          <div class="page-total">显示1-20 共 1000</div>
-          <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" class="fr"
-                         :current-page="currentPage4"
-                         :page-sizes="[100, 200, 300, 400]"
-                         background
-                         :page-size="100"
-                         layout=" prev, pager, next, jumper"
-                         :total="400">
-          </el-pagination>
-        </div>
-
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -101,7 +110,7 @@
 
 <script>
   import moment from 'moment'
-  import {timesDecimals,getLocalTime,superLong} from './../api/util'
+  import {timesDecimals, getLocalTime, superLong,copys} from './../api/util'
 
   export default {
     name: 'home',
@@ -115,27 +124,60 @@
         assetsListLoading: true,
         //账户资产列表
         addressAssetsData: [],
-        options: [
-          {value: '选项1', label: '普通资产'},
-          {value: '选项2', label: '合约资产'}
+        //资产类型
+        assetsOptions: [
+          {value: '0', label: '所有资产'},
+          {value: '1', label: '普通资产'},
+          {value: '2', label: '合约资产'}
         ],
-        value: '',
+        assetsValue: "所有资产",
 
+        //资产加载动画
+        txListDataLoading: true,
         //交易数据
         txListData: [],
         //页码
-        pageNumber:1,
+        pageNumber: 1,
         //条数
-        pageSize:10,
+        pageSize: 10,
         //总条数
-        pageCount:0,
+        pageCount: 0,
         //类型
-        type:0,
+        type: 0,
         //隐藏共识奖励
-        isHide:true,
+        isHide: false,
 
-        value3: true,
-        currentPage4: 4,
+        //交易类型
+        typeOptions: [
+          {value: '0', label: '所有交易'},
+          {value: '1', label: '共识奖励'},
+          {value: '2', label: '转账交易'},
+          {value: '3', label: '设置别名'},
+          {value: '4', label: '创建节点'},
+          {value: '5', label: '加入共识'},
+          {value: '6', label: '零钱换整'},
+          {value: '7', label: '退出共识'},
+          {value: '8', label: '黄牌惩罚'},
+          {value: '9', label: '红牌惩罚'},
+          {value: '10', label: '注销节点'},
+          {value: '11', label: '通用数据'},
+          {value: '12', label: '创建合约'},
+          {value: '13', label: '调用合约'},
+          {value: '14', label: '删除合约'},
+          {value: '15', label: '合约转账'},
+          {value: '16', label: '合约返还'},
+          {value: '17', label: '通证转账'},
+        ],
+        typeValue: '所有交易',
+
+        //收入/支出
+        inAndOutOptions: [
+          {value: '0', label: '收入/支出'},
+          {value: '1', label: '收入'},
+          {value: '2', label: '支出'},
+        ],
+        inAndOutValue: '收入/支出',
+
       };
     },
     components: {},
@@ -145,18 +187,67 @@
         this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
       }, 500);
       this.getAddressInfoByNode(this.addressInfo.address);
+
+      setTimeout(() => {
+        this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+      }, 200);
+
     },
     mounted() {
 
     },
     watch: {
       addressInfo(val, old) {
-        if (val.address !== old.address) {
-          this.getAddressInfoByNode(this.addressInfo.address);
+        if (val.address !== old.address && old.address) {
+          if (this.homeActive === 'homeFirst') {
+            this.getAddressInfoByNode(this.addressInfo.address);
+            setTimeout(() => {
+              this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+            }, 200);
+          } else {
+            this.pageNumber = 1;
+            this.pageSize = 10;
+            this.pageCount = 0;
+            this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+          }
         }
       }
     },
     methods: {
+
+      /**
+       * tab 切换
+       * @param tab
+       **/
+      handleClick(tab) {
+        if (tab.name === 'homeSecond') {
+          this.pageNumber = 1;
+          this.pageSize = 10;
+          this.pageCount = 0;
+          this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+        }
+      },
+
+      /**
+       * 资产下拉框选择
+       * * @param e
+       **/
+      channgeAsesets(e) {
+        this.assetsListLoading = true;
+        if (e.toString() === "1") {
+          this.getAddressInfoByNode(this.addressInfo.address);
+        } else if (e.toString() === "2") {
+          this.addressAssetsData = [];
+          setTimeout(() => {
+            this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+          }, 200);
+        } else {
+          this.getAddressInfoByNode(this.addressInfo.address);
+          setTimeout(() => {
+            this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+          }, 200);
+        }
+      },
 
       /**
        * 获取地址网络信息
@@ -170,13 +261,13 @@
             let newAssetsList = {};
             if (response.hasOwnProperty("result")) {
               newAssetsList.account = "NULS";
-              newAssetsList.type = 0;
+              newAssetsList.type = 1;
               newAssetsList.total = timesDecimals(response.result.totalBalance);
               newAssetsList.locking = timesDecimals(response.result.consensusLock + response.result.timeLock);
               newAssetsList.balance = timesDecimals(response.result.balance);
             } else {
               newAssetsList.account = "NULS";
-              newAssetsList.type = 0;
+              newAssetsList.type = 1;
               newAssetsList.total = 0;
               newAssetsList.locking = 0;
               newAssetsList.balance = 0;
@@ -187,17 +278,34 @@
           .catch((error) => {
             console.log(error);
           });
-
       },
 
       /**
-       * tab 切换
-       * @param tab
+       * 获取地址代币列表
+       * @param pageSize
+       * @param pageRows
+       * @param address
        **/
-      handleClick(tab) {
-        if(tab.name ==='homeSecond'){
-          this.getTxlistByAddress(this.pageNumber,this.pageSize,this.addressInfo.address,this.type,this.isHide)
-        }
+      getTokenListByAddress(pageSize, pageRows, address) {
+        this.$post('/', 'getAccountTokens', [pageSize, pageRows, address])
+          .then((response) => {
+            let newAssetsList = {};
+            if (response.hasOwnProperty("result")) {
+              for (let itme of response.result.list) {
+                itme.account = itme.tokenName;
+                itme.type = 2;
+                itme.total = timesDecimals(itme.balance, itme.decimals);
+                itme.locking = '--';
+                itme.balance = timesDecimals(itme.balance, itme.decimals);
+              }
+              newAssetsList = response.result.list;
+            }
+            this.addressAssetsData.push(...newAssetsList);
+            this.assetsListLoading = false;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       },
 
       /**
@@ -208,26 +316,50 @@
        * @param type
        * @param isHide
        **/
-      getTxlistByAddress(pageSize,pageRows,address,type,isHide) {
-        this.$post('/', 'getAccountTxs', [pageSize,pageRows,address,type,isHide])
+      getTxlistByAddress(pageSize, pageRows, address, type, isHide) {
+        this.txListDataLoading = true;
+        this.$post('/', 'getAccountTxs', [pageSize, pageRows, address, type, isHide])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
-                item.txid = superLong(item.txHash,8);
+                item.txid = superLong(item.txHash, 8);
                 item.balance = timesDecimals(item.balance);
               }
-              this.txListData = response.result.list
+              this.txListData = response.result.list;
+              this.pageCount = response.result.totalCount;
+              this.txListDataLoading = false;
             }
           })
       },
 
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+      /**
+       * 资产列表分页功能
+       * @param val
+       **/
+      addressAssetsListPages(val) {
+        //TODO 资产数据是否会有很多分页功能
+        console.log(val);
       },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+
+      /**
+       * 隐藏共识奖励
+       * @param e
+       **/
+      changeHide(e) {
+        this.isHide = e;
+        this.pageNumber = 1;
+        this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+      },
+
+      /**
+       * 交易列表分页功能
+       * @param val
+       **/
+      txListPages(val) {
+        this.pageNumber = val;
+        this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
       },
 
       /**
@@ -239,6 +371,15 @@
         this.$router.push({
           name: name
         })
+      },
+
+      /**
+       * 复制方法
+       * @param sting
+       **/
+      copy(sting) {
+        copys(sting);
+        this.$message({message: "已经复制完成", type: 'success', duration: 1000});
       },
     }
   }
