@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <div class="card_long mt_20 w1200 bg-white">
+    <div class="card_long mt_20 w1200 bg-white" v-show="false">
       <h5 class="card-title font18">节点信息 <i class="el-icon-edit-outline"></i></h5>
       <ul>
         <li>创建地址 <label>TTarKL8DjsoXmn2EAYTnzC5KK8oxNULS</label></li>
@@ -37,7 +37,7 @@
     </div>
     <div class="cb"></div>
 
-    <div class="entrust w1200 bg-white" v-show="false">
+    <div class="entrust w1200 bg-white" v-show="true">
       <div class="entrust_add w630">
         <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
           <el-form-item label="委托金额(NULS):" prop="age">

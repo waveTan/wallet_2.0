@@ -69,6 +69,17 @@ export function timesDecimals(nu, decimals = 8) {
 }
 
 /**
+ * 右移八位
+ * Execute the float addition
+ * @param arg
+ * @returns {BigNumber}
+ */
+export function RightShiftEight(arg) {
+  let right8 = new BigNumber(100000000);
+  return right8.times(arg);
+}
+
+/**
  * 超长数字显示
  * @param nu
  * @param powerNu

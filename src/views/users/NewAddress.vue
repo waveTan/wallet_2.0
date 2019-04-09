@@ -151,7 +151,7 @@
       submitPasswordForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.newAddressInfo = nuls.newAddress(this.passwordForm.pass);
+            this.newAddressInfo = nuls.newAddress(2,this.passwordForm.pass);
             this.isFirst = false
           } else {
             return false;
@@ -172,7 +172,7 @@
           selection:false,
         };
         localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
-        this.toUrl('home')
+        this.toUrl('address')
       }
     }
   }

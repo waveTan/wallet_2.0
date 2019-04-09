@@ -6,21 +6,21 @@
       </div>
       <div class="nav">
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
-          <el-menu-item index="home">钱包</el-menu-item>
-          <el-menu-item index="transfer">转账</el-menu-item>
-          <el-menu-item index="consensus">共识</el-menu-item>
-          <el-menu-item index="contract" disabled>合约</el-menu-item>
-          <el-submenu index="5" disabled>
-            <template slot="title">应用</template>
+          <el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>
+          <el-menu-item index="transfer">{{$t('nav.transfer')}}</el-menu-item>
+          <el-menu-item index="consensus">{{$t('nav.consensus')}}</el-menu-item>
+          <el-menu-item index="contract" disabled>{{$t('nav.contracts')}}</el-menu-item>
+          <!--<el-submenu index="5" disabled>
+            <template slot="title">{{$t('nav.application')}}</template>
             <el-menu-item index="2-1">应用1</el-menu-item>
             <el-menu-item index="2-2">应用2</el-menu-item>
             <el-menu-item index="2-3">应用3</el-menu-item>
-          </el-submenu>
+          </el-submenu>-->
         </el-menu>
       </div>
       <div class="tool">
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
-          <el-submenu index="21" class="user">
+          <el-submenu index="address" class="user">
             <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
 
             <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
@@ -34,10 +34,10 @@
             <el-menu-item index="2-1">系统设置</el-menu-item>
             <el-menu-item index="2-2">服务节点</el-menu-item>
           </el-submenu>
-          <el-submenu index="23">
-            <template slot="title">Eng</template>
-            <el-menu-item index="中文">中文</el-menu-item>
-            <el-menu-item index="English">English</el-menu-item>
+          <el-submenu index="lang">
+            <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>
+            <el-menu-item index="cn">中文</el-menu-item>
+            <el-menu-item index="en">English</el-menu-item>
           </el-submenu>
           <li class="el-menu-item">|</li>
           <el-menu-item index="24">帮助</el-menu-item>
@@ -64,6 +64,8 @@
         navActive: '1',
         //地址列表
         addressList: [],
+        //语言选择
+        lang: 'cn'
       };
     },
     components: {},
@@ -71,10 +73,9 @@
       this.getAddressList();
     },
     mounted() {
-      //console.log(this.addressList)
       setInterval(() => {
         this.getAddressList();
-      },500)
+      }, 500)
     },
     methods: {
 
@@ -85,26 +86,34 @@
        */
       handleSelect(key, keyPath) {
         //console.log(key, keyPath);
-        if (key.length > 20) {
-          for (let itmes of this.addressList) {
-            //清除选中
-            if (itmes.selection) {
-              itmes.selection = false;
-              localStorage.setItem(itmes.address, JSON.stringify(itmes))
+        if (keyPath.length > 1) {
+          if (keyPath[0] === "address") {
+            if (keyPath[1] === "address") {
+              this.$router.push({
+                name: keyPath[1]
+              })
+            } else {
+              for (let itmes of this.addressList) {
+                //清除选中
+                if (itmes.selection) {
+                  itmes.selection = false;
+                  localStorage.setItem(itmes.address, JSON.stringify(itmes))
+                }
+                //添加选中
+                if (itmes.address === keyPath[1]) {
+                  itmes.selection = true;
+                  localStorage.setItem(itmes.address, JSON.stringify(itmes))
+                }
+              }
             }
-            //添加选中
-            if (itmes.address === keyPath[1]) {
-              itmes.selection = true;
-              localStorage.setItem(itmes.address, JSON.stringify(itmes))
-            }
+          } else if (keyPath[0] === "lang") {
+            this.selectLanguage(key)
           }
-
         } else {
           this.$router.push({
             name: key
           })
         }
-
       },
 
       /**
@@ -124,10 +133,18 @@
           }
         }
       },
-    },
-    watch: {
 
-    }
+      /**
+       * 语言切换
+       * @param e
+       * @param Boolean
+       */
+      selectLanguage(e) {
+        this.lang = e;
+        this.$i18n.locale = this.lang;
+      },
+    },
+    watch: {}
   }
 </script>
 

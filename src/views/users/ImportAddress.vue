@@ -110,7 +110,7 @@
        * 导入
        */
       importWallet() {
-        const importAddressInfo = nuls.importByKey(this.importKeyForm.key,this.importKeyForm.pass);
+        const importAddressInfo = nuls.importByKey(2,this.importKeyForm.key,this.importKeyForm.pass);
         let addressInfo = {
           address: importAddressInfo.address,
           aesPri: importAddressInfo.aesPri,
@@ -120,7 +120,7 @@
           selection:false,
         };
         localStorage.setItem(importAddressInfo.address, JSON.stringify(addressInfo));
-        this.toUrl('home')
+        this.toUrl('address')
       },
 
       /**

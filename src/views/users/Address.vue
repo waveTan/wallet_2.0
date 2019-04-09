@@ -112,6 +112,7 @@
         for (let itmes of this.addressList) {
           if (itmes.selection) {
             countSelection++;
+            sessionStorage.setItem(itmes.address, JSON.stringify(itmes));
             if (countSelection > 1) {
               itmes.selection = false;
               localStorage.setItem(itmes.address, JSON.stringify(itmes))

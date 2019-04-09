@@ -1,12 +1,12 @@
 <template>
   <div class="home">
-    <h3 class="title">
+    <h3 class="title" v-if="addressInfo">
       {{addressInfo.address}}
       <span v-show="addressInfo.alias">({{addressInfo.alias}})</span>
       <i class="iconfont icon-fuzhi clicks" @click="copy(addressInfo.address)"></i>
     </h3>
     <el-tabs v-model="homeActive" @tab-click="handleClick" class="w1200">
-      <el-tab-pane label="资产列表" name="homeFirst" v-loading="assetsListLoading">
+      <el-tab-pane label="主网资产" name="homeFirst" v-loading="assetsListLoading">
         <el-select v-model="assetsValue" @change="channgeAsesets">
           <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
@@ -15,7 +15,8 @@
         <el-table :data="addressAssetsData" stripe border>
           <el-table-column prop="account" label="资产" align="center">
           </el-table-column>
-          <el-table-column prop="type" label="类型" align="center" width="150">
+          <el-table-column label="类型" align="center" width="150">
+            <template slot-scope="scope"><span>{{ $t('addressType.'+scope.row.type) }}</span></template>
           </el-table-column>
           <el-table-column prop="total" label="总额">
           </el-table-column>
@@ -32,7 +33,7 @@
             <template>
               <label class="click tab_bn">转账</label>
               <span class="tab_line">|</span>
-              <label class="click tab_bn">收款</label>
+              <label class="click tab_bn">交易记录</label>
             </template>
           </el-table-column>
         </el-table>
@@ -49,7 +50,7 @@
         </div>
 
       </el-tab-pane>
-      <el-tab-pane label="交易列表" name="homeSecond">
+      <el-tab-pane label="跨链资产" name="homeSecond" disabled>
         <div v-loading="txListDataLoading">
           <div class="filter">
             <el-select v-model="assetsValue">
@@ -110,7 +111,7 @@
 
 <script>
   import moment from 'moment'
-  import {timesDecimals, getLocalTime, superLong,copys} from './../api/util'
+  import {timesDecimals, getLocalTime, superLong, copys} from './../api/util'
 
   export default {
     name: 'home',
@@ -119,7 +120,7 @@
         //tab默认选中
         homeActive: 'homeFirst',
         //默认账户信息
-        addressInfo: "",
+        addressInfo: {},
         //资产加载动画
         assetsListLoading: true,
         //账户资产列表
@@ -131,7 +132,6 @@
           {value: '2', label: '合约资产'}
         ],
         assetsValue: "所有资产",
-
         //资产加载动画
         txListDataLoading: true,
         //交易数据
@@ -186,11 +186,18 @@
       setInterval(() => {
         this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
       }, 500);
-      this.getAddressInfoByNode(this.addressInfo.address);
 
-      setTimeout(() => {
-        this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
-      }, 200);
+      //判断是否有账户
+      if (this.addressInfo) {
+        this.getAddressInfoByNode(this.addressInfo.address);
+        setTimeout(() => {
+          this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+        }, 200);
+      } else {
+        this.$router.push({
+          name: "newAddress"
+        })
+      }
 
     },
     mounted() {
@@ -198,19 +205,22 @@
     },
     watch: {
       addressInfo(val, old) {
-        if (val.address !== old.address && old.address) {
-          if (this.homeActive === 'homeFirst') {
-            this.getAddressInfoByNode(this.addressInfo.address);
-            setTimeout(() => {
-              this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
-            }, 200);
-          } else {
-            this.pageNumber = 1;
-            this.pageSize = 10;
-            this.pageCount = 0;
-            this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+        if (val) {
+          if (val.address !== old.address && old.address) {
+            if (this.homeActive === 'homeFirst') {
+              this.getAddressInfoByNode(this.addressInfo.address);
+              setTimeout(() => {
+                this.getTokenListByAddress(this.pageNumber, this.pageSize, this.addressInfo.address)
+              }, 200);
+            } else {
+              this.pageNumber = 1;
+              this.pageSize = 10;
+              this.pageCount = 0;
+              this.getTxlistByAddress(this.pageNumber, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+            }
           }
         }
+
       }
     },
     methods: {

@@ -4,7 +4,7 @@ export const RUN_DEV = false;
 //正式、测试网络的api
 const API_URL = RUN_DEV ? 'https://api.nuls.io/' : 'http://116.62.135.185:8081/';
 //Request url
-export const API_ROOT = IS_DEV ? 'http://116.62.135.185:8081/' : API_URL;
+export const API_ROOT = IS_DEV ? 'http://192.168.1.192:18003/' : API_URL;
 //Request response time
 export const API_TIME = IS_DEV ? '9000' : '8000';
 

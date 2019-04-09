@@ -89,7 +89,8 @@
     .el-dialog {
       width: 370px;
       .el-dialog__body {
-        padding: 30px 20px 30px 20px;
+        background-color: #F5F6F9 !important;
+        padding: 30px 20px 30px 20px !important;
         .el-form {
           .el-form-item {
             .el-form-item__label {
