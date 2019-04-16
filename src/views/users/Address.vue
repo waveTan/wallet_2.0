@@ -128,7 +128,7 @@
 
       /**
        * 获取地址网络信息
-       * @param address
+       * @param addressInfo
        **/
       getAddressInfoByNode(addressInfo) {
         addressInfo.alias = "";
@@ -219,6 +219,7 @@
       /**
        * 连接跳转
        * @param name
+       * @param param
        */
       toUrl(name, param) {
         //console.log(name)

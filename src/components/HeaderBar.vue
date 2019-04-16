@@ -137,7 +137,6 @@
       /**
        * 语言切换
        * @param e
-       * @param Boolean
        */
       selectLanguage(e) {
         this.lang = e;

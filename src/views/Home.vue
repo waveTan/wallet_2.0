@@ -31,9 +31,9 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template>
-              <label class="click tab_bn">转账</label>
+              <label class="click tab_bn" @click="toUrl('transfer')">转账</label>
               <span class="tab_line">|</span>
-              <label class="click tab_bn">交易记录</label>
+              <label class="click tab_bn" @click="toUrl('frozenList')">交易记录</label>
             </template>
           </el-table-column>
         </el-table>
