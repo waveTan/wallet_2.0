@@ -17,6 +17,11 @@ export default new Router({
       component: resolve => require(['@/views/users/FrozenList.vue'], resolve)
     },
     {
+      path: '/wallet/txList',
+      name: 'txList',
+      component: resolve => require(['@/views/users/TxList.vue'], resolve)
+    },
+    {
       path: '/transfer',
       name: 'transfer',
       component: resolve => require(['@/views/transfer/Transfer.vue'], resolve)

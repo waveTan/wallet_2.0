@@ -195,7 +195,6 @@
        * @param fromAddress
        * @param amount
        */
-      /*   async countFee(fromAddress, amount, remark) {*/
       async countFee(fromAddress = this.transferForm.fromAddress, amount = this.transferForm.amount, remark = this.transferForm.remarks) {
         if (amount) {
           console.log(fromAddress);

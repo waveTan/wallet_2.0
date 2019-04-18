@@ -9,16 +9,16 @@
 
     <div class="w1200 mt_20">
       <el-table :data="txListData" stripe border>
-        <el-table-column prop="transType" label="类型" align="center">
+        <el-table-column prop="type" label="类型" align="center">
         </el-table-column>
-        <el-table-column label="TxID" align="center" min-width="200">
+        <el-table-column label="txHash" align="center" min-width="200">
           <template slot-scope="scope">
-            <span class="click" @click="toUrl('frozenList')">{{scope.row.txid}}</span>
+            <span class="click" @click="toUrl('frozenList')">{{scope.row.txHash}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="time" label="时间" align="center">
+        <el-table-column prop="createTime" label="时间" align="center">
         </el-table-column>
-        <el-table-column prop="heightTime" label="解冻高度/时间" align="center">
+        <el-table-column prop="height" label="解冻高度/时间" align="center">
         </el-table-column>
         <el-table-column prop="freezing" label="冻结原因" align="center">
         </el-table-column>
@@ -88,7 +88,7 @@
             console.log(response);
             if (response.hasOwnProperty("result")) {
               this.pageTotal = response.result.totalCount;
-              //addressInfo.balance = timesDecimals(response.result.balance);
+              this.txListData = response.result.list;
             }
             //localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })

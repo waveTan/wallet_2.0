@@ -17,7 +17,30 @@
 <script>
   export default {
     name: "bottom-bar",
+    created() {
+      this.getBestBlockHeader();
+    },
+    mounted() {
+
+    },
     methods: {
+
+      /**
+       * 获取最新高度
+       */
+      getBestBlockHeader() {
+        this.$post('/', 'getBestBlockHeader', [])
+          .then((response) => {
+            //console.log(response)
+            /*if (response.hasOwnProperty("result")) {
+              this.$store.commit('SET_HEIGHT', response.result.height);
+            }*/
+          })
+          .catch((error)=>{
+            console.log("getBestBlockHeader:"+error)
+          })
+      },
+
       /**
        * 连接跳转
        * @param name

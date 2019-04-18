@@ -6310,9 +6310,9 @@ nugget@^2.0.1:
     single-line-log "^1.1.2"
     throttleit "0.0.2"
 
-nuls-sdk-js@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/nuls-sdk-js/-/nuls-sdk-js-2.0.2.tgz#914a2ad32f4c860903ac470896ae275078ffd6ca"
+nuls-sdk-js@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/nuls-sdk-js/-/nuls-sdk-js-2.0.3.tgz#4eb25dd60470c14d866c7904d84b309cfa741fdf"
   dependencies:
     axios "^0.18.0"
     babel-cli "^6.26.0"

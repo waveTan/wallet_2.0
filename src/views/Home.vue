@@ -33,7 +33,7 @@
             <template>
               <label class="click tab_bn" @click="toUrl('transfer')">转账</label>
               <span class="tab_line">|</span>
-              <label class="click tab_bn" @click="toUrl('frozenList')">交易记录</label>
+              <label class="click tab_bn" @click="toUrl('txList')">交易记录</label>
             </template>
           </el-table-column>
         </el-table>
@@ -286,7 +286,8 @@
             this.assetsListLoading = false;
           })
           .catch((error) => {
-            console.log(error);
+            console.log("getAccount:"+error);
+            this.assetsListLoading = false;
           });
       },
 
@@ -314,7 +315,8 @@
             this.assetsListLoading = false;
           })
           .catch((error) => {
-            console.log(error);
+            console.log("getAccountTokens:"+error);
+            this.assetsListLoading = false;
           });
       },
 

@@ -1,24 +1,24 @@
 <template>
-  <div class="transfer_info bg-gray">
+  <div class="transfer_info bg-gray" v-loading="txInfoLoading">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包</p>
-        <h3 class="title">00202c4576a2126b5e96963a391a342d8f1430a088122cbb7f6164a844becc1b5561<i
-                class="iconfont icon-fuzhi clicks"></i></h3>
+        <BackBar backTitle="交易记录"></BackBar>
+        <h3 class="title">{{hash}}
+          <i class="iconfont icon-fuzhi clicks" @click="copy(hash)"></i></h3>
       </div>
     </div>
 
     <div class="card_long mt_20 w1200">
       <h5 class="card-title font18">基础信息</h5>
       <ul>
-        <li>时间 <label>2019-03-27 14:00:20</label></li>
-        <li>金额 <label>12345678.12345678<span class="fCN">NULS</span></label></li>
-        <li>高度 <label class="click"><u class="td">888888</u></label></li>
-        <li>余额 <label>12345678.12345678<span class="fCN">NULS</span></label></li>
-        <li>类型 <label>转账交易</label></li>
-        <li>手续费 <label>0.01<span class="fCN">NULS</span></label></li>
+        <li>时间 <label>{{txInfo.createTime}}</label></li>
+        <li>金额 <label>{{txInfo.value}}<span class="fCN">NULS</span></label></li>
+        <li>高度 <label class="click"><u class="td">{{txInfo.height}}</u></label></li>
+        <li>类型 <label>{{$t('type.'+txInfo.type)}}</label></li>
+        <li>手续费 <label>{{txInfo.fee}}<span class="fCN">NULS</span></label></li>
         <li>状态 <label>已确认</label></li>
-        <li>备注 <label>转账交易测试开始</label></li>
+        <li>备注 <label class="remark overflow" :title="txInfo.remark">{{txInfo.remark}}</label></li>
+        <li></li>
         <p class="cb"></p>
       </ul>
     </div>
@@ -28,26 +28,14 @@
       <div class="card-info left fl">
         <h5 class="card-title font18">Input</h5>
         <ul>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
+          <li v-for="itme of inputData"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
                   class="fCN">NULS</span></label></li>
         </ul>
       </div>
       <div class="card-info right fr">
         <h5 class="card-title font18">Output</h5>
         <ul>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
-                  class="fCN">NULS</span></label></li>
-          <li><font class="click td">TTaqFxuD1xc6gpixUiMVQsjMZ5fdYJ2o</font><label>123456.123456<span
+          <li v-for="itme of outputData"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
                   class="fCN">NULS</span></label></li>
         </ul>
       </div>
@@ -57,8 +45,92 @@
 </template>
 
 <script>
+  import moment from 'moment'
+  import {timesDecimals, getLocalTime, superLong, copys} from '@/api/util'
+  import BackBar from '@/components/BackBar'
+
   export default {
-    name: "transfer-info"
+    data() {
+      return {
+        txInfoLoading: false,//交易详情动画加载
+        hash: this.$route.query.hash,//hash
+        txInfo: [],//交易信息
+        inputData: [],//输入
+        outputData: [],//输出
+      };
+    },
+    created() {
+
+    },
+    mounted() {
+      this.getTxInfoByHash(this.hash);
+    },
+    components: {
+      BackBar
+    },
+    methods: {
+
+      /**
+       * 根据hash获取交易详情
+       * @param hash
+       **/
+      getTxInfoByHash(hash) {
+        this.txInfoLoading = true;
+        this.$post('/', 'getTx', [hash])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              response.result.createTime = moment(getLocalTime(response.result.createTime)).format('YYYY-MM-DD HH:mm:ss');
+              response.result.fee = timesDecimals(response.result.fee);
+              response.result.value = timesDecimals(response.result.value);
+
+              //输入
+              if (response.result.coinFroms) {
+                for (let itme of response.result.coinFroms) {
+                  itme.amount = timesDecimals(itme.amount);
+                }
+                this.inputData = response.result.coinFroms
+              }
+
+              //输出
+              if (response.result.coinTos) {
+                for (let itme of response.result.coinTos) {
+                  itme.amount = timesDecimals(itme.amount);
+                }
+                this.outputData = response.result.coinTos
+              }
+
+              this.txInfo = response.result;
+              this.txInfoLoading = false;
+            }
+          })
+          .catch((error) => {
+            console.log("getTx:" + error)
+          })
+      },
+
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name) {
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
+
+      /**
+       * 复制方法
+       * @param sting
+       **/
+      copy(sting) {
+        copys(sting);
+        this.$message({message: "已经复制完成", type: 'success', duration: 1000});
+      },
+
+
+    }
   }
 </script>
 

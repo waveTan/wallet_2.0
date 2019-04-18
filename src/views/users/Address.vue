@@ -143,7 +143,7 @@
             localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })
           .catch((error) => {
-            console.log(error);
+            console.log("getAccount:"+error);
             localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           });
 
