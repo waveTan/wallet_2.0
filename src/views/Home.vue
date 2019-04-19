@@ -111,7 +111,7 @@
 
 <script>
   import moment from 'moment'
-  import {timesDecimals, getLocalTime, superLong, copys} from './../api/util'
+  import {timesDecimals, getLocalTime, superLong, copys} from '@/api/util'
 
   export default {
     name: 'home',

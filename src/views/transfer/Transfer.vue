@@ -77,8 +77,8 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
-  import utils from 'nuls-sdk-js/lib/utils/utils';
-  import {timesDecimals,RightShiftEight} from './../../api/util'
+  import sdk from 'nuls-sdk-js/lib/api/sdk';
+  import {timesDecimals, RightShiftEight, Plus, Times} from '@/api/util'
   import Password from './../../components/PasswordBar'
 
   export default {
@@ -86,7 +86,7 @@
 
     data() {
       let validateToAddress = (rule, value, callback) => {
-        let patrn = /^(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{20,35}$/;
+        let patrn = /^(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{20,50}$/;
         if (value === '') {
           callback(new Error('请输入收款地址'))
         } else if (!patrn.exec(value)) {
@@ -114,18 +114,18 @@
         }
       };
       return {
-        //默认账户信息
-        addressInfo: '',
+        addressInfo: '', //默认账户信息
+        balanceInfo: '',//账户余额信息
         //转账数据
         transferForm: {
           fromAddress: '',
-          toAddress: '',
+          toAddress: 'tNULSeBaMnXoAkNEhqjYv7k7A8PEKPAmXXXVWv',
           type: 'NULS',
-          amount: '',
-          remarks: '',
+          amount: 88,
+          remarks: 'wave test 88 nuls',
         },
+        //验证信息
         transferRules: {
-
           toAddress: [
             {validator: validateToAddress, trigger: ['blur', 'change']}
           ],
@@ -177,17 +177,65 @@
        * 弹框确认提交
        *
        **/
-      confirmTraanser() {
+      async confirmTraanser() {
+        this.getNulsBalance(1, this.transferForm.fromAddress);
         this.$refs.password.showPassword(true)
+      },
+
+      /**
+       * 获取转出账户余额信息
+       *  @param assetsId
+       *  @param address
+       **/
+      async getNulsBalance(assetsId = 1, address) {
+        await this.$post('/', 'getAccountBalance', [assetsId, address])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              this.balanceInfo = {'balance': response.result.balance, 'nonce': response.result.nonce};
+            }
+          })
+          .catch((error) => {
+            console.log("getAccountBalance:"+error)
+          });
       },
 
       /**
        *  获取密码框的密码
        * @param password
        **/
-      passSubmit(password) {
+      async passSubmit(password) {
+        let inputs = [];
+        let amount = Times(this.transferForm.amount, 100000000);
+        let fee = Times(this.fee, 100000000);
+
+        if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
+          return {success: false, data: "Your balance is not enough."}
+        }
+        //组装input
+        inputs.push({
+          address: this.transferForm.fromAddress,
+          assetsChainId: 2,
+          assetsId: 1,
+          amount: Number(Plus(amount, fee).toString()),
+          locked: 0,
+          nonce: this.balanceInfo.nonce
+        });
+
+        //组装output
+        let outputs = [
+          {
+            address: this.transferForm.toAddress, assetsChainId: 2,
+            assetsId: 1, amount: Number(amount.toString()), lockTime: 0
+          }
+        ];
+
+        const pri = sdk.decrypteOfAES(this.addressInfo.aesPri, password);
+        const pub = this.addressInfo.pub;
+        const remark = this.transferForm.remarks;
+        let hex = await nuls.transferTransaction(pri, pub, inputs, outputs, remark);
+        this.validateTx(hex);
         this.transferVisible = false;
-        console.log(password)
       },
 
       /**
@@ -197,64 +245,80 @@
        */
       async countFee(fromAddress = this.transferForm.fromAddress, amount = this.transferForm.amount, remark = this.transferForm.remarks) {
         if (amount) {
-          console.log(fromAddress);
-          console.log(amount);
-          const inputUtxoInfo = await nuls.getInputUtxo(fromAddress, amount);
-          setTimeout(()=>{
-            console.log(inputUtxoInfo);
-          },1000);
+          /* const inputUtxoInfo = await nuls.getInputUtxo(fromAddress, amount);
+           setTimeout(()=>{
+             console.log(inputUtxoInfo);
+           },1000);*/
 
           //判断是否零钱过多
-          if (inputUtxoInfo.length >= 6000) {
-            return {success: false, data: "Too much change to consume"}
-          } else {
-            //计算手续费 （124 + 50  * inputs.length + 38 * outputs.length + remark.bytes.length ）/1024
-            const fee = Math.ceil((124 + 50 * inputUtxoInfo.length + 38 * 2 + +utils.stringToByte(remark).length) / 1024) * 100000;
-            this.fee = timesDecimals(fee);
-            return fee;
-          }
+          /* if (inputUtxoInfo.length >= 6000) {
+             return {success: false, data: "Too much change to consume"}
+           } else {
+             //计算手续费 （124 + 50  * inputs.length + 38 * outputs.length + remark.bytes.length ）/1024
+             const fee = Math.ceil((124 + 50 * inputUtxoInfo.length + 38 * 2 + +utils.stringToByte(remark).length) / 1024) * 100000;
+             this.fee = timesDecimals(fee);
+             return fee;
+           }*/
+
+          const fee = 100000;
+          this.fee = timesDecimals(fee);
+          return fee;
         }
       },
 
+      /**
+       * 验证交易
+       *  @param txHex
+       **/
+      async validateTx(txHex) {
+        //console.log(txHex);
+        await this.$post('/', 'validateTx', [txHex])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              if(response.result.value){
+                this.broadcastTx(txHex);
+              }else {
+                console.log("签名失败！")
+              }
+            } else {
+              console.log("交易验证失败！")
+            }
+          })
+          .catch((error) => {
+            console.log("validateTx:" + error);
+          });
+      },
 
-      //转账功能 trustUrl
-      /*async transfer(pri, pub, fromAddress, toAddress, amount, remark) {
-        const inputUtxoInfo = await nuls.getInputUtxo(fromAddress, amount);
-        let inputOwner = [];
-        let totalValue = 0;
-        let fee = 0;
-        //判断是否零钱过多
-        if (inputUtxoInfo.length >= 6000) {
-          return {success: false, data: "Too much change to consume"}
-        } else {
-          //计算手续费 （124 + 50  * inputs.length + 38 * outputs.length + remark.bytes.length ）/1024
-          fee = Math.ceil((124 + 50 * inputUtxoInfo.length + 38 * 2 + +utils.stringToByte(remark).length) / 1024) * 100000;
-        }
-        //计算转账金额需要的inputUtxo
-        for (let item of inputUtxoInfo) {
-          totalValue = totalValue + item.value;
-          inputOwner.push({owner: item.owner, na: item.value, lockTime: item.lockTime});
-        }
-        let outputOwner = [
-          {owner: toAddress, na: amount, lockTime: 0}
-        ];
-        //计算多余的金额并返回
-        if (totalValue - amount > 0) {
-          outputOwner.push({owner: fromAddress, na: totalValue - amount - fee, lockTime: 0})
-        }
-        let hashOrSignature = nuls.transferTransaction(pri, pub, inputOwner, outputOwner, remark);
-        //验证交易
-        let valiTransactions = await nuls.valiTransaction(hashOrSignature.signature);
-        //验证交易成功
-        if (valiTransactions.data.success) {
-          //广播交易
-          const broadcastInfo = await nuls.broadcast(hashOrSignature.signature);
-          console.log(broadcastInfo.data)
-          //return broadcastInfo.data
-        } else {
-          return {success: false, data: "verify transaction failure"}
-        }
-      }*/
+      /**
+       * 广播交易
+       *  @param txHex
+       **/
+      async broadcastTx(txHex) {
+        await this.$post('/', 'broadcastTx', [txHex])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+               if(response.result.value){
+                  this.toUrl("txList");
+               }
+             }
+          })
+          .catch((error) => {
+            console.log("broadcastTx:"+error)
+          });
+      },
+
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name) {
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
 
     }
   }

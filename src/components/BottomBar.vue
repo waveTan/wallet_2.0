@@ -3,7 +3,8 @@
     <div class="w1200 font14">
       <div class="left fl">
         <p class="fl">节点服务器: <u class="clicks" @click="toUrl('nodeService')">http://apiserver.nuls.io</u></p>
-        <p class="fr">高度:节点131000000/主网 13112323</p>
+        <!--<p class="fr">高度:节点131000000/主网 {{heightInfo.height}}</p>-->
+        <p class="fr">主网高度: {{heightInfo.height}}</p>
       </div>
       <div class="right fr">
         <label class="clicks">服务协议</label>
@@ -17,6 +18,11 @@
 <script>
   export default {
     name: "bottom-bar",
+    data() {
+      return {
+        heightInfo:[],
+      }
+    },
     created() {
       this.getBestBlockHeader();
     },
@@ -32,12 +38,12 @@
         this.$post('/', 'getBestBlockHeader', [])
           .then((response) => {
             //console.log(response)
-            /*if (response.hasOwnProperty("result")) {
-              this.$store.commit('SET_HEIGHT', response.result.height);
-            }*/
+            if (response.hasOwnProperty("result")) {
+              this.heightInfo = response.result;
+            }
           })
-          .catch((error)=>{
-            console.log("getBestBlockHeader:"+error)
+          .catch((error) => {
+            console.log("getBestBlockHeader:" + error)
           })
       },
 
@@ -45,7 +51,7 @@
        * 连接跳转
        * @param name
        */
-      toUrl(name){
+      toUrl(name) {
         //console.log(name)
         this.$router.push({
           name: name
@@ -57,6 +63,7 @@
 
 <style lang="less">
   @import "./../assets/css/style";
+
   .bottom {
     height: 60px;
     border-top: 1px solid @Dcolour;

@@ -35,7 +35,7 @@
       return {
         passwordVisible: false,
         passwordForm: {
-          password: '',
+          password: '123456asd',
         },
         passwordRules: {
           password: [
@@ -51,7 +51,7 @@
       passwordVisible(val) {
         if (val) {
           setTimeout(() => {
-            this.$refs['inpus'].focus()
+            //this.$refs['inpus'].focus()
           }, 200)
         }
       }
@@ -66,7 +66,7 @@
         this.passwordVisible = false;
       },
       showPassword(boolean) {
-        this.passwordForm.password = '';
+        //this.passwordForm.password = '';
         this.passwordVisible = boolean;
       },
       //弹出密码输入框

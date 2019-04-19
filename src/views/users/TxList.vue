@@ -1,5 +1,5 @@
 <template>
-  <div class="BackBar.vue bg-gray">
+  <div class="txlist bg-gray">
     <div class="bg-white">
       <div class="w1200">
         <!--<p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包</p>-->
@@ -72,14 +72,12 @@
   export default {
     data() {
       return {
-        //资产类型
         assetsOptions: [
           {value: '0', label: '所有资产'},
           {value: '1', label: '普通资产'},
           {value: '2', label: '合约资产'}
-        ],
+        ], //资产类型
         assetsValue: "所有资产",
-        //交易类型
         typeOptions: [
           {value: '0', label: '所有交易'},
           {value: '1', label: '共识奖励'},
@@ -99,27 +97,23 @@
           {value: '15', label: '合约转账'},
           {value: '16', label: '合约返还'},
           {value: '17', label: '通证转账'},
-        ],
+        ], //交易类型
         typeValue: '所有交易',
-        //收入/支出
         inAndOutOptions: [
           {value: '0', label: '收入/支出'},
           {value: '1', label: '收入'},
           {value: '2', label: '支出'},
-        ],
+        ], //收入/支出
         inAndOutValue: '收入/支出',
-        //资产加载动画
-        txListDataLoading: false,
-        //交易数据
-        txListData: [],
+        txListDataLoading: true,//资产加载动画
+        txListData: [],//交易数据
         pageIndex: 1, //页码
-        pageSize: 20, //每页条数
+        pageSize: 10, //每页条数
         pageTotal: 0,//总页数
         addressInfo: [], //账户信息
-        //类型
-        type: 0,
-        //隐藏共识奖励
-        isHide: true,
+        type: 0,//类型
+        isHide: true,//隐藏共识奖励
+        txListSetInterval: null,//定时器
       };
     },
     created() {
@@ -130,6 +124,15 @@
     },
     mounted() {
       this.getTxlistByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHide);
+      //10秒循环一次数据
+      this.txListSetInterval = setInterval(() => {
+        this.getTxlistByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHide);
+      }, 10000);
+
+    },
+    //离开当前页面后执行
+    destroyed() {
+      clearInterval(this.txListSetInterval);
     },
     components: {
       BackBar
@@ -145,7 +148,6 @@
        * @param isHide
        **/
       getTxlistByAddress(pageSize, pageRows, address, type, isHide) {
-        this.txListDataLoading = true;
         this.$post('/', 'getAccountTxs', [pageSize, pageRows, address, type, isHide])
           .then((response) => {
             //console.log(response);
@@ -182,7 +184,8 @@
        **/
       txListPages(val) {
         this.pageIndex = val;
-        //this.getTxlistByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHide)
+        this.txListDataLoading = true;
+        this.getTxlistByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHide)
       },
 
       /**
@@ -204,5 +207,10 @@
 </script>
 
 <style lang="less">
-
+    .txlist{
+      .title{
+        height: 50px;
+        line-height: 20px;
+      }
+    }
 </style>

@@ -13,12 +13,12 @@
           <p><i></i>请设置密码用以导入账户、转账、参与共识等重要行为验证</p>
           <p><i></i>请认真保存钱包密码，NULS钱包不存储密码，也无法帮您找回，请务必牢记</p>
         </div>
-        <el-form :model="passwordForm" status-icon :rules="passwordRules" ref="passwordForm" class="mb_20">
-          <el-form-item label="别名" prop="pass">
-            <el-input type="text" v-model="passwordForm.pass" autocomplete="off"></el-input>
+        <el-form :model="aliasForm" status-icon :rules="aliasRules" ref="aliasForm" class="mb_20">
+          <el-form-item label="别名" prop="alias">
+            <el-input type="text" v-model="aliasForm.alias" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item class="form-next">
-            <el-button type="success" @click="submitPasswordForm('passwordForm')">下一步</el-button>
+            <el-button type="success" @click="submitAliasForm('aliasForm')">下一步</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -32,27 +32,23 @@
 
   export default {
     data() {
-      let validatePass = (rule, value, callback) => {
-        let patrn = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,20}$/;
+      let validateAlias = (rule, value, callback) => {
+        let patrn = /^(?!_)(?!.*?_$)[a-z0-9_]+$/;
         if (value === '') {
-          callback(new Error('请输入密码'));
+          callback(new Error('请输入别名'));
         } else if (!patrn.exec(value)) {
-          callback(new Error('请输入由字母和数字组合的8-20位密码'));
+          callback(new Error('请输入别名(只允许使用小写字母、数字、下划线（下划线不能在两端）)'));
         } else {
-          if (this.passwordForm.checkPass !== '') {
-            this.$refs.passwordForm.validateField('checkPass');
-          }
           callback();
         }
       };
       return {
-        passwordForm: {
-          pass: '123456asd',
-
+        aliasForm: {
+          alias: '',
         },
-        passwordRules: {
-          pass: [
-            {validator: validatePass, trigger: 'blur'}
+        aliasRules: {
+          alias: [
+            {validator: validateAlias, trigger: 'blur'}
           ]
         },
         //新建的地址信息
@@ -76,11 +72,10 @@
        * 创建地址
        * @param formName
        */
-      submitPasswordForm(formName) {
+      submitAliasForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.newAddressInfo = nuls.newAddress(this.passwordForm.pass);
-            this.isFirst = false
+            console.log(this.aliasForm.alias);
           } else {
             return false;
           }

@@ -51,7 +51,6 @@
       return {
         passwordForm: {
           pass: '123456asd',
-
         },
         passwordRules: {
           pass: [
