@@ -79,7 +79,7 @@
   import nuls from 'nuls-sdk-js'
   import sdk from 'nuls-sdk-js/lib/api/sdk';
   import {timesDecimals, RightShiftEight, Plus, Times} from '@/api/util'
-  import Password from './../../components/PasswordBar'
+  import Password from '@/components/PasswordBar'
 
   export default {
 
@@ -196,7 +196,7 @@
             }
           })
           .catch((error) => {
-            console.log("getAccountBalance:"+error)
+            console.log("getAccountBalance:" + error)
           });
       },
 
@@ -230,10 +230,15 @@
           }
         ];
 
-        const pri = sdk.decrypteOfAES(this.addressInfo.aesPri, password);
-        const pub = this.addressInfo.pub;
-        const remark = this.transferForm.remarks;
-        let hex = await nuls.transferTransaction(pri, pub, inputs, outputs, remark);
+        let params = {
+          type: 2,
+          pri: sdk.decrypteOfAES(this.addressInfo.aesPri, password),
+          pub: this.addressInfo.pub,
+          remark: this.transferForm.remarks,
+          inputs: inputs,
+          outputs: outputs,
+        };
+        let hex = await nuls.transactionSignature(params);
         this.validateTx(hex);
         this.transferVisible = false;
       },
@@ -245,6 +250,8 @@
        */
       async countFee(fromAddress = this.transferForm.fromAddress, amount = this.transferForm.amount, remark = this.transferForm.remarks) {
         if (amount) {
+          console.log(fromAddress);
+          console.log(remark);
           /* const inputUtxoInfo = await nuls.getInputUtxo(fromAddress, amount);
            setTimeout(()=>{
              console.log(inputUtxoInfo);
@@ -276,9 +283,9 @@
           .then((response) => {
             //console.log(response);
             if (response.hasOwnProperty("result")) {
-              if(response.result.value){
+              if (response.result.value) {
                 this.broadcastTx(txHex);
-              }else {
+              } else {
                 console.log("签名失败！")
               }
             } else {
@@ -299,13 +306,13 @@
           .then((response) => {
             //console.log(response);
             if (response.hasOwnProperty("result")) {
-               if(response.result.value){
-                  this.toUrl("txList");
-               }
-             }
+              if (response.result.value) {
+                this.toUrl("txList");
+              }
+            }
           })
           .catch((error) => {
-            console.log("broadcastTx:"+error)
+            console.log("broadcastTx:" + error)
           });
       },
 
@@ -319,7 +326,6 @@
           name: name
         })
       },
-
     }
   }
 </script>

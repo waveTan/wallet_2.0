@@ -1,6 +1,10 @@
 <template>
   <div class="consensus bg-gray">
-    <h3 class="title">TTakMrubBXi998CZgaYdTy2Nrqwd2ptq<span>(wave)</span><i class="iconfont icon-fuzhi clicks"></i></h3>
+    <h3 class="title">
+      {{addressInfo.address}}
+      <span v-show="addressInfo.alias">({{addressInfo.alias}})</span>
+      <i class="iconfont icon-fuzhi clicks" @click="copy(addressInfo.address)"></i>
+    </h3>
     <div class="card w1200">
       <div class="card-info left fl">
         <h5 class="card-title font18">我的共识</h5>
@@ -38,7 +42,7 @@
         </div>
 
         <div class="node">
-          <div class="node_info" v-for="item in allNodeData">
+          <div class="node_info" v-for="item in allNodeData" :key="item.agentId">
             <h4 class="bg-gray">
               <i class="el-icon-setting"></i>
               <span class="uppercase">{{item.agentId}}</span>
@@ -150,7 +154,7 @@
 
 <script>
   import SelectBar from '@/components/SelectBar';
-  import {timesDecimals} from '@/api/util'
+  import {timesDecimals, copys} from '@/api/util'
 
   export default {
     name: 'consensus',
@@ -206,7 +210,6 @@
 
       this.getConsensusNodeCount();
       this.getCoinInfo();
-
     },
     mounted() {
       this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
@@ -219,9 +222,9 @@
        * TODO 待实现
        **/
       getConsensusInfoByAddress(address) {
-        this.$post('/', 'getConsensusNodes', [pageIndex, pageSize, type])
+        this.$post('/', 'getConsensusNodes', [address])
           .then((response) => {
-            console.log(response);
+            console.log(address);
             if (response.hasOwnProperty("result")) {
               //addressInfo.balance = timesDecimals(response.result.balance);
             }
@@ -229,7 +232,6 @@
           })
           .catch((error) => {
             console.log(error);
-            /*localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));*/
           });
 
       },
@@ -337,13 +339,12 @@
         }*/
       },
 
-
       /**
        * 连接跳转
        * @param name
        * @param params
        */
-      toUrl(name,params) {
+      toUrl(name, params) {
         //console.log(name,params);
         let newQuery = {};
         if (name === 'consensusInfo') {
@@ -355,6 +356,15 @@
           name: name,
           query: newQuery
         })
+      },
+
+      /**
+       * 复制方法
+       * @param sting
+       **/
+      copy(sting) {
+        copys(sting);
+        this.$message({message: "已经复制完成", type: 'success', duration: 1000});
       },
 
       handleClick(tab, event) {

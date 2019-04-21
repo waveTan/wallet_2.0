@@ -28,7 +28,7 @@
 </template>
 
 <script>
-  import nuls from 'nuls-sdk-js'
+ /* import nuls from 'nuls-sdk-js'*/
 
   export default {
     data() {

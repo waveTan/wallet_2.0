@@ -28,14 +28,14 @@
       <div class="card-info left fl">
         <h5 class="card-title font18">Input</h5>
         <ul>
-          <li v-for="itme of inputData"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
+          <li v-for="itme of inputData" :key="itme.address"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
                   class="fCN">NULS</span></label></li>
         </ul>
       </div>
       <div class="card-info right fr">
         <h5 class="card-title font18">Output</h5>
         <ul>
-          <li v-for="itme of outputData"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
+          <li v-for="itme of outputData" :key="itme.address"><font class="click td">{{itme.address}}</font><label>{{itme.amount}}<span
                   class="fCN">NULS</span></label></li>
         </ul>
       </div>
@@ -46,7 +46,7 @@
 
 <script>
   import moment from 'moment'
-  import {timesDecimals, getLocalTime, superLong, copys} from '@/api/util'
+  import {timesDecimals, getLocalTime, copys} from '@/api/util'
   import BackBar from '@/components/BackBar'
 
   export default {

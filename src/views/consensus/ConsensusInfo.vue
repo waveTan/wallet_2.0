@@ -37,25 +37,25 @@
     </div>
     <div class="cb"></div>
 
-    <div class="entrust w1200 bg-white" v-show="false">
+    <div class="entrust w1200 bg-white" v-show="jionNode">
       <div class="entrust_add w630">
-        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2">
-          <el-form-item label="委托金额(NULS):" prop="age">
-            <span class="balance font12 fr">可用余额：12345678.46557812</span>
-            <el-input v-model.number="ruleForm2.age">
+        <el-form :model="jionNodeForm" status-icon :rules="jionNodeRules" ref="jionNodeForm">
+          <el-form-item label="委托金额(NULS):" prop="amount">
+            <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
+            <el-input v-model.number="jionNodeForm.amount">
             </el-input>
           </el-form-item>
           <div class="font14">
-            手续费：0.002 <span class="fCN">NULS</span>
+            手续费：{{fee}} <span class="fCN">NULS</span>
           </div>
           <el-form-item class="form-next">
-            <el-button type="success" @click="submitForm('ruleForm2')">确 定</el-button>
+            <el-button type="success" @click="jionNodeSubmitForm('jionNodeForm')">确 定</el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
 
-    <div class="entrust_list w1200 bg-white">
+    <div class="entrust_list w1200 bg-white" v-show="!jionNode">
       <div class="top_total font12">
         总委托量：255633 <span class="fCN">NULS</span>
       </div>
@@ -78,7 +78,7 @@
       </el-table>
       <div class="pages">
         <div class="page-total">显示1-20 共 {{pageTotal}}</div>
-        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" class="fr" background
+        <el-pagination class="fr" background
                        v-show="pageTotal>pageSize"
                        :page-size="pageSize"
                        layout=" prev, pager, next, jumper"
@@ -87,45 +87,62 @@
       </div>
     </div>
 
+    <Password ref="password" @passwordSubmit="passSubmit">
+    </Password>
   </div>
 </template>
 
 <script>
   import moment from 'moment'
-  import {timesDecimals, getLocalTime} from '@/api/util'
+  import sdk from 'nuls-sdk-js/lib/api/sdk';
+  import txs from 'nuls-sdk-js/lib/model/txs';
+  import {timesDecimals, getLocalTime, Times, Plus} from '@/api/util'
+  import Password from '@/components/PasswordBar'
 
   export default {
     data() {
-      let checkAge = (rule, value, callback) => {
+      let checkAmount = (rule, value, callback) => {
         if (!value) {
-          return callback(new Error('委托金额不能为空！'));
+          return callback(new Error('委托金额不能为空'));
+        } else {
+          callback()
         }
       };
 
       return {
-
+        addressInfo: {},//账户信息
+        balanceInfo: {},//账户余额信息
         nodeInfo: {},//节点详情
+        fee: 0.001,//手续费
+        jionNode: true,//是否显示加入共识
         nodeDepositData: [],//委托列表
         pageIndex: 1, //页码
         pageSize: 20, //每页条数
         pageTotal: 0,//总页数
-
-        ruleForm2: {
-          age: ''
+        jionNodeForm: {
+          amount: 2002
         },
-        rules2: {
-          age: [
-            {validator: checkAge, trigger: 'blur'}
+        jionNodeRules: {
+          amount: [
+            {validator: checkAmount, trigger: 'blur'}
           ]
         },
       };
     },
     created() {
+      this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
+      setInterval(() => {
+        this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
+      }, 500);
+
       this.getNodeInfoByHash(this.$route.query.hash);
       this.getNodeDepositByHash(this.pageIndex, this.pageSize, this.$route.query.hash)
     },
     mounted() {
       //this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
+    },
+    components: {
+      Password,
     },
     methods: {
 
@@ -136,7 +153,7 @@
       getNodeInfoByHash(hash) {
         this.$post('/', 'getConsensusNode', [hash])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               response.result.agentReward = timesDecimals(response.result.agentReward);
               response.result.deposit = timesDecimals(response.result.deposit);
@@ -163,7 +180,7 @@
       getNodeDepositByHash(pageIndex, pageSize, hash) {
         this.$post('/', 'getConsensusDeposit', [pageIndex, pageSize, hash])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.amount = timesDecimals(itme.amount);
@@ -171,36 +188,141 @@
                 itme.createTime = moment(getLocalTime(itme.createTime)).format('YYYY-MM-DD HH:mm:ss');
               }
               this.nodeDepositData = response.result.list;
+              if (response.result.totalCount === 0) {
+                this.jionNode = true
+              }
               this.pageTotal = response.result.totalCount;
             }
-            //localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })
           .catch((error) => {
-            console.log(error);
-            /*localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));*/
+            console.log("getConsensusDeposit:" + error);
           });
 
       },
 
-      submitForm(formName) {
+      handleCurrentChange(val) {
+        console.log(val)
+      },
+
+      //加入共识提交
+      jionNodeSubmitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            alert('submit!');
+            this.getNulsBalance(1, this.addressInfo.address);
+            this.$refs.password.showPassword(true)
           } else {
-            console.log('error submit!!');
             return false;
           }
         });
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
+
+      /**
+       *  获取密码框的密码
+       * @param password
+       **/
+      async passSubmit(password) {
+        //console.log(password)
+        let inputs = [];
+        let amount = Times(this.jionNodeForm.amount, 100000000);
+        let fee = Times(this.fee, 100000000);
+
+        if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
+          return {success: false, data: "Your balance is not enough."}
+        }
+        //组装input
+        inputs.push({
+          address: this.addressInfo.address,
+          assetsChainId: 2,
+          assetsId: 1,
+          amount: Number(Plus(amount, fee).toString()),
+          locked: 0,
+          nonce: this.balanceInfo.nonce
+        });
+
+        //组装output
+        let outputs = [
+          {
+            address: this.addressInfo.address, assetsChainId: 2,
+            assetsId: 1, amount: Number(amount.toString()), lockTime: -1
+          }
+        ];
+
+       let depositInfo = {
+          address: this.addressInfo.address,
+          agentHash: this.$route.query.hash,
+          deposit: Number(amount.toString())
+        };
+
+        let tt = new txs.DepositTransaction(depositInfo);
+        tt.time = new Date().valueOf();
+        tt.setCoinData(inputs, outputs);
+        tt.remark = "";
+        sdk.signatureTx(tt, sdk.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub);
+        let txhex = tt.txSerialize().toString('hex');
+
+        this.validateTx(txhex);
       },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+
+      /**
+       * 获取转出账户余额信息
+       *  @param assetsId
+       *  @param address
+       **/
+      async getNulsBalance(assetsId = 1, address) {
+        await this.$post('/', 'getAccountBalance', [assetsId, address])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              this.balanceInfo = {'balance': response.result.balance, 'nonce': response.result.nonce};
+            }
+          })
+          .catch((error) => {
+            console.log("getAccountBalance:" + error)
+          });
       },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
-      }
+
+      /**
+       * 验证交易
+       *  @param txHex
+       **/
+      async validateTx(txHex) {
+        //console.log(txHex);
+        await this.$post('/', 'validateTx', [txHex])
+          .then((response) => {
+            console.log(response);
+            if (response.hasOwnProperty("result")) {
+              if (response.result.value) {
+                this.broadcastTx(txHex);
+              } else {
+                console.log("签名失败！")
+              }
+            } else {
+              console.log("交易验证失败！")
+            }
+          })
+          .catch((error) => {
+            console.log("validateTx:" + error);
+          });
+      },
+
+      /**
+       * 广播交易
+       *  @param txHex
+       **/
+      async broadcastTx(txHex) {
+        await this.$post('/', 'broadcastTx', [txHex])
+          .then((response) => {
+            console.log(response);
+            if (response.hasOwnProperty("result")) {
+              if (response.result.value) {
+                this.jionNode = false;
+              }
+            }
+          })
+          .catch((error) => {
+            console.log("broadcastTx:" + error)
+          });
+      },
     }
   }
 </script>
