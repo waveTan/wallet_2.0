@@ -31,8 +31,8 @@
         <li></li>
         <p class="cb"></p>
       </ul>
-      <div class="logout bg-white" v-show="false">
-        <el-button type="danger">注销节点</el-button>
+      <div class="logout bg-white" v-show="addressInfo.address === nodeInfo.agentAddress">
+        <el-button type="danger" @click="stopNode">注销节点</el-button>
       </div>
     </div>
     <div class="cb"></div>
@@ -61,7 +61,7 @@
       </div>
 
       <div class="top_ico">
-        <i class="el-icon-plus click" @click="toUrl('newAddress')"></i>
+        <i class="el-icon-plus click" @click="showNodeList"></i>
       </div>
       <el-table :data="nodeDepositData" stripe border>
         <el-table-column prop="blockHeight" label="高度" align="center">
@@ -71,15 +71,14 @@
         <el-table-column prop="amount" label="金额(NULS)" align="center">
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template>
-            <label class="click tab_bn">退出</label>
+          <template slot-scope="scope">
+            <label class="click tab_bn" @click="cancelDeposit(scope.row)">退出</label>
           </template>
         </el-table-column>
       </el-table>
       <div class="pages">
         <div class="page-total">显示1-20 共 {{pageTotal}}</div>
-        <el-pagination class="fr" background
-                       v-show="pageTotal>pageSize"
+        <el-pagination class="fr" background v-show="pageTotal>pageSize" @current-change="nodeDepositPages"
                        :page-size="pageSize"
                        layout=" prev, pager, next, jumper"
                        :total="pageTotal">
@@ -96,7 +95,7 @@
   import moment from 'moment'
   import sdk from 'nuls-sdk-js/lib/api/sdk';
   import txs from 'nuls-sdk-js/lib/model/txs';
-  import {timesDecimals, getLocalTime, Times, Plus} from '@/api/util'
+  import {timesDecimals, getLocalTime, Times, Plus, Minus} from '@/api/util'
   import Password from '@/components/PasswordBar'
 
   export default {
@@ -114,10 +113,12 @@
         balanceInfo: {},//账户余额信息
         nodeInfo: {},//节点详情
         fee: 0.001,//手续费
-        jionNode: true,//是否显示加入共识
+        outInfo: '',//退出信息
+        passwordType:0,//输入密码后的提交类型 0:加入委托 1:退出委托 2:注销节点
+        jionNode: false,//是否显示加入共识
         nodeDepositData: [],//委托列表
         pageIndex: 1, //页码
-        pageSize: 20, //每页条数
+        pageSize: 5, //每页条数
         pageTotal: 0,//总页数
         jionNodeForm: {
           amount: 2002
@@ -200,11 +201,27 @@
 
       },
 
-      handleCurrentChange(val) {
-        console.log(val)
+      /**
+       * 委托列表分页
+       * @param val
+       **/
+      nodeDepositPages(val) {
+        this.pageIndex = val;
+        this.getNodeDepositByHash(this.pageIndex, this.pageSize, this.$route.query.hash);
       },
 
-      //加入共识提交
+      /**
+       * 显示加入共识
+       **/
+      showNodeList() {
+        this.jionNode = true;
+        this.getNodeDepositByHash(this.pageIndex, this.pageSize, this.$route.query.hash);
+      },
+
+      /**
+       * 加入共识
+       * @param formName
+       **/
       jionNodeSubmitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -217,48 +234,102 @@
       },
 
       /**
+       *退出共识
+       * @param hash
+       **/
+      cancelDeposit(outInfo) {
+        this.outInfo = outInfo;
+        this.getNulsBalance(1, this.addressInfo.address);
+        this.$refs.password.showPassword(true)
+      },
+
+      /**
+       *  注销节点
+       **/
+      stopNode(){
+        console.log("停止节点");
+        this.getNulsBalance(1, this.addressInfo.address);
+        this.$refs.password.showPassword(true);
+        this.passwordType = 3;
+      },
+
+      /**
        *  获取密码框的密码
        * @param password
        **/
       async passSubmit(password) {
-        //console.log(password)
+
         let inputs = [];
+        let outputs = [];
         let amount = Times(this.jionNodeForm.amount, 100000000);
         let fee = Times(this.fee, 100000000);
+
+        if(this.passwordType ===0){ //加入共识
+
+        }else if(this.passwordType ===1){ //退出共识
+
+        }else if(this.passwordType ===2) { //注销节点
+
+        }else {
+          console.log("交易类型错误")
+        }
+
 
         if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
           return {success: false, data: "Your balance is not enough."}
         }
         //组装input
-        inputs.push({
-          address: this.addressInfo.address,
-          assetsChainId: 2,
-          assetsId: 1,
-          amount: Number(Plus(amount, fee).toString()),
-          locked: 0,
-          nonce: this.balanceInfo.nonce
-        });
+        if (this.jionNode) {
+
+        } else {
+          console.log(Number(Times(this.outInfo.amount,100000000).toString()));
+          inputs.push({
+            address: this.addressInfo.address,
+            assetsChainId: 2,
+            assetsId: 1,
+            amount: Number(Times(this.outInfo.amount,100000000).toString()),
+            locked: -1,
+            nonce: this.outInfo.txHash.substring(this.outInfo.txHash.length - 16)//这里是hash的最后16个字符
+          });
+        }
 
         //组装output
-        let outputs = [
-          {
+        if (this.jionNode) {
+          outputs.push({
             address: this.addressInfo.address, assetsChainId: 2,
             assetsId: 1, amount: Number(amount.toString()), lockTime: -1
-          }
-        ];
+          });
+        }else {
+          outputs.push({
+            address: this.addressInfo.address, assetsChainId: 2,
+            assetsId: 1, amount: Number(Times(Minus(this.outInfo.amount, 0.001), 100000000).toString()), lockTime: -1
+          });
+        }
 
-       let depositInfo = {
+
+        let depositInfo = {
           address: this.addressInfo.address,
           agentHash: this.$route.query.hash,
           deposit: Number(amount.toString())
         };
 
-        let tt = new txs.DepositTransaction(depositInfo);
-        tt.time = new Date().valueOf();
-        tt.setCoinData(inputs, outputs);
-        tt.remark = "";
-        sdk.signatureTx(tt, sdk.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub);
-        let txhex = tt.txSerialize().toString('hex');
+
+        let txhex = '';
+        if (this.jionNode) {
+          let tt = new txs.DepositTransaction(depositInfo);
+          tt.time = new Date().valueOf();
+          tt.setCoinData(inputs, outputs);
+          tt.remark = "";
+          sdk.signatureTx(tt, sdk.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub);
+          txhex = tt.txSerialize().toString('hex');
+        } else {
+          let tt = new txs.WithdrawTransaction(this.outInfo.txHash);
+          tt.time = new Date().valueOf();
+          tt.setCoinData(inputs, outputs);
+          tt.remark = "";
+          sdk.signatureTx(tt, sdk.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub);
+          txhex = tt.txSerialize().toString('hex');
+        }
 
         this.validateTx(txhex);
       },

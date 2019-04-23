@@ -37,7 +37,7 @@ export function Times(nu, arg) {
 }
 
 /**
- * 乘法
+ * 加法
  * @param nu
  * @param arg
  * @returns {BigNumber}

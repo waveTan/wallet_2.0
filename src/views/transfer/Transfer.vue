@@ -22,11 +22,11 @@
         </el-form-item>
         <el-form-item label="转账金额:" prop="amount">
           <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
-          <el-input v-model="transferForm.amount " @change="countFee">
+          <el-input v-model="transferForm.amount">
           </el-input>
         </el-form-item>
         <el-form-item label="备注:">
-          <el-input type="textarea" v-model="transferForm.remarks" @change="countFee">
+          <el-input type="textarea" v-model="transferForm.remarks">
           </el-input>
         </el-form-item>
         <div class="font14">
@@ -79,10 +79,10 @@
   import nuls from 'nuls-sdk-js'
   import sdk from 'nuls-sdk-js/lib/api/sdk';
   import {timesDecimals, RightShiftEight, Plus, Times} from '@/api/util'
+  import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import Password from '@/components/PasswordBar'
 
   export default {
-
 
     data() {
       let validateToAddress = (rule, value, callback) => {
@@ -134,7 +134,7 @@
           ],
         },
         //手续费
-        fee: 0,
+        fee: 0.001,
         //转账确认弹框
         transferVisible: false,
       };
@@ -178,8 +178,16 @@
        *
        **/
       async confirmTraanser() {
-        this.getNulsBalance(1, this.transferForm.fromAddress);
-        this.$refs.password.showPassword(true)
+        await getNulsBalance(this.transferForm.fromAddress).then((response) => {
+          if (response.success) {
+            this.balanceInfo = response.data;
+            this.$refs.password.showPassword(true)
+          } else {
+            this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+          }
+        }).catch((error) => {
+          this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+        });
       },
 
       /**
@@ -193,10 +201,13 @@
             //console.log(response);
             if (response.hasOwnProperty("result")) {
               this.balanceInfo = {'balance': response.result.balance, 'nonce': response.result.nonce};
+              this.$refs.password.showPassword(true);
+            } else {
+              this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
             }
           })
           .catch((error) => {
-            console.log("getAccountBalance:" + error)
+            this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
           });
       },
 
@@ -205,115 +216,32 @@
        * @param password
        **/
       async passSubmit(password) {
-        let inputs = [];
-        let amount = Times(this.transferForm.amount, 100000000);
-        let fee = Times(this.fee, 100000000);
-
-        if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
-          return {success: false, data: "Your balance is not enough."}
-        }
-        //组装input
-        inputs.push({
-          address: this.transferForm.fromAddress,
+        let transferInfo = {
+          fromAddress: this.transferForm.fromAddress,
+          toAddress: this.transferForm.toAddress,
           assetsChainId: 2,
           assetsId: 1,
-          amount: Number(Plus(amount, fee).toString()),
-          locked: 0,
-          nonce: this.balanceInfo.nonce
-        });
-
-        //组装output
-        let outputs = [
-          {
-            address: this.transferForm.toAddress, assetsChainId: 2,
-            assetsId: 1, amount: Number(amount.toString()), lockTime: 0
-          }
-        ];
-
-        let params = {
-          type: 2,
-          pri: sdk.decrypteOfAES(this.addressInfo.aesPri, password),
-          pub: this.addressInfo.pub,
-          remark: this.transferForm.remarks,
-          inputs: inputs,
-          outputs: outputs,
+          amount: Number(Times(this.transferForm.amount, 100000000).toString()),
+          fee: countFee()
         };
-        let hex = await nuls.transactionSignature(params);
-        this.validateTx(hex);
-        this.transferVisible = false;
-      },
-
-      /**
-       * 计算手续费
-       * @param fromAddress
-       * @param amount
-       */
-      async countFee(fromAddress = this.transferForm.fromAddress, amount = this.transferForm.amount, remark = this.transferForm.remarks) {
-        if (amount) {
-          console.log(fromAddress);
-          console.log(remark);
-          /* const inputUtxoInfo = await nuls.getInputUtxo(fromAddress, amount);
-           setTimeout(()=>{
-             console.log(inputUtxoInfo);
-           },1000);*/
-
-          //判断是否零钱过多
-          /* if (inputUtxoInfo.length >= 6000) {
-             return {success: false, data: "Too much change to consume"}
-           } else {
-             //计算手续费 （124 + 50  * inputs.length + 38 * outputs.length + remark.bytes.length ）/1024
-             const fee = Math.ceil((124 + 50 * inputUtxoInfo.length + 38 * 2 + +utils.stringToByte(remark).length) / 1024) * 100000;
-             this.fee = timesDecimals(fee);
-             return fee;
-           }*/
-
-          const fee = 100000;
-          this.fee = timesDecimals(fee);
-          return fee;
+        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+        let txhex = "";
+        if (inOrOutputs.success) {
+          txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+        } else {
+          this.$message({message: "input or outputs ：" + inOrOutputs.data, type: 'error', duration: 1000});
         }
-      },
-
-      /**
-       * 验证交易
-       *  @param txHex
-       **/
-      async validateTx(txHex) {
-        //console.log(txHex);
-        await this.$post('/', 'validateTx', [txHex])
-          .then((response) => {
-            //console.log(response);
-            if (response.hasOwnProperty("result")) {
-              if (response.result.value) {
-                this.broadcastTx(txHex);
-              } else {
-                console.log("签名失败！")
-              }
-            } else {
-              console.log("交易验证失败！")
-            }
-          })
-          .catch((error) => {
-            console.log("validateTx:" + error);
-          });
-      },
-
-      /**
-       * 广播交易
-       *  @param txHex
-       **/
-      async broadcastTx(txHex) {
-        await this.$post('/', 'broadcastTx', [txHex])
-          .then((response) => {
-            //console.log(response);
-            if (response.hasOwnProperty("result")) {
-              if (response.result.value) {
-                this.toUrl("txList");
-              }
-            }
-          })
-          .catch((error) => {
-            console.log("broadcastTx:" + error)
-          });
+        //console.log(txhex);
+        //验证并广播交易
+        await validateAndBroadcast(txhex).then((response) => {
+          if(response.success){
+            this.toUrl("txList");
+          }else {
+            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
+          }
+        }).catch((err) => {
+          this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
+        });
       },
 
       /**

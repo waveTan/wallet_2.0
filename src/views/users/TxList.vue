@@ -27,8 +27,8 @@
           </el-switch>
         </div>
         <el-table :data="txListData" stripe border>
-          <el-table-column prop="account" label="资产" align="center" width="100">
-
+          <el-table-column label="资产" align="center" width="100">
+            <template slot-scope="scope"><span>NULS</span></template>
           </el-table-column>
           <el-table-column label="类型" align="center" width="100">
             <template slot-scope="scope"><span>{{ $t('type.'+scope.row.type) }}</span></template>
@@ -40,11 +40,13 @@
           </el-table-column>
           <el-table-column prop="createTime" label="时间" align="center">
           </el-table-column>
-          <el-table-column prop="amount" label="金额" align="center">
+          <el-table-column label="金额" align="center">
+            <template slot-scope="scope"><span :class="scope.row.transferType === 1 ? 'fCN':'fred'">{{scope.row.amount*scope.row.transferType}}</span></template>
           </el-table-column>
           <el-table-column prop="balance" label="余额" align="center">
           </el-table-column>
-          <el-table-column prop="state" label="状态" align="center" width="100">
+          <el-table-column label="状态" align="center" width="100">
+            <template slot-scope="scope"><span>{{ $t('transferStatus.'+scope.row.status) }}</span></template>
           </el-table-column>
         </el-table>
         <div class="pages">
@@ -69,6 +71,7 @@
   import moment from 'moment'
   import {timesDecimals, getLocalTime, superLong} from '@/api/util'
   import BackBar from '@/components/BackBar'
+
   export default {
     data() {
       return {
@@ -150,7 +153,7 @@
       getTxlistByAddress(pageSize, pageRows, address, type, isHide) {
         this.$post('/', 'getAccountTxs', [pageSize, pageRows, address, type, isHide])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
@@ -163,8 +166,8 @@
               this.txListDataLoading = false;
             }
           })
-          .catch((error)=>{
-            console.log("getAccountTxs:"+error)
+          .catch((error) => {
+            console.log("getAccountTxs:" + error)
           })
       },
 
@@ -193,7 +196,7 @@
        * @param name
        * @param params
        */
-      toUrl(name,params) {
+      toUrl(name, params) {
         //console.log(name,params);
         let newQuery = {hash: params};
         this.$router.push({
@@ -207,10 +210,10 @@
 </script>
 
 <style lang="less">
-    .txlist{
-      .title{
-        height: 50px;
-        line-height: 20px;
-      }
+  .txlist {
+    .title {
+      height: 50px;
+      line-height: 20px;
     }
+  }
 </style>

@@ -110,6 +110,12 @@ const cn ={
     "3": "多签地址"
   },
 
+  "transferStatus": {
+    "undefined":"",
+    "0": "未确认",
+    "1": "已确认"
+  },
+
   "nodeType": {
     "undefined":"",
     "0": "综合排序",

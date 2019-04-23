@@ -131,6 +131,9 @@
         newAddressInfo: '',
       };
     },
+    mounted() {
+    },
+
     methods: {
 
       /**
