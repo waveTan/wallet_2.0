@@ -11,7 +11,7 @@
         <ul>
           <li>总委托 <label><u class="td click" @click="toUrl('consensusList')">123456.123456</u><span
                   class="fCN">NULS</span></label></li>
-          <li>可用余额 <label>123456.123456<span class="fCN">NULS</span></label></li>
+          <li>可用余额 <label>{{addressInfo.balance}}<span class="fCN">NULS</span></label></li>
           <li>总共识奖励 <label>123456.123456<span class="fCN">NULS</span></label></li>
         </ul>
       </div>
@@ -44,9 +44,9 @@
         <div class="node">
           <div class="node_info" v-for="item in allNodeData" :key="item.agentId">
             <h4 class="bg-gray">
-              <i class="el-icon-setting"></i>
+              <i class="iconfont iconwo"></i>
               <span class="uppercase">{{item.agentId}}</span>
-              <i :class="item.type ===1 ? 'el-icon-refresh' : 'el-icon-time'"></i>
+              <i class="iconfont" :class="item.type ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
               <i class="follow el-icon-star-off"></i>
             </h4>
             <ul class="bg-white click" @click="toUrl('consensusInfo',item.txHash)">

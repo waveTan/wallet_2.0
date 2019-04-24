@@ -93,8 +93,8 @@
 
 <script>
   import moment from 'moment'
-  import sdk from 'nuls-sdk-js/lib/api/sdk';
-  import txs from 'nuls-sdk-js/lib/model/txs';
+  import nuls from 'nuls-sdk-js'
+  import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import {timesDecimals, getLocalTime, Times, Plus, Minus} from '@/api/util'
   import Password from '@/components/PasswordBar'
 
@@ -114,7 +114,7 @@
         nodeInfo: {},//节点详情
         fee: 0.001,//手续费
         outInfo: '',//退出信息
-        passwordType:0,//输入密码后的提交类型 0:加入委托 1:退出委托 2:注销节点
+        passwordType: 0,//输入密码后的提交类型 0:加入委托 1:退出委托 2:注销节点
         jionNode: false,//是否显示加入共识
         nodeDepositData: [],//委托列表
         pageIndex: 1, //页码
@@ -198,7 +198,6 @@
           .catch((error) => {
             console.log("getConsensusDeposit:" + error);
           });
-
       },
 
       /**
@@ -225,8 +224,17 @@
       jionNodeSubmitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.getNulsBalance(1, this.addressInfo.address);
-            this.$refs.password.showPassword(true)
+            getNulsBalance(this.addressInfo.address).then((response) => {
+              if (response.success) {
+                this.balanceInfo = response.data;
+                this.$refs.password.showPassword(true);
+                this.passwordType = 0;
+              } else {
+                this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+              }
+            }).catch((error) => {
+              this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+            });
           } else {
             return false;
           }
@@ -239,15 +247,23 @@
        **/
       cancelDeposit(outInfo) {
         this.outInfo = outInfo;
-        this.getNulsBalance(1, this.addressInfo.address);
-        this.$refs.password.showPassword(true)
+        getNulsBalance(this.addressInfo.address).then((response) => {
+          if (response.success) {
+            this.balanceInfo = response.data;
+            this.$refs.password.showPassword(true);
+            this.passwordType = 1;
+          } else {
+            this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+          }
+        }).catch((error) => {
+          this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+        });
       },
 
       /**
        *  注销节点
        **/
-      stopNode(){
-        console.log("停止节点");
+      stopNode() {
         this.getNulsBalance(1, this.addressInfo.address);
         this.$refs.password.showPassword(true);
         this.passwordType = 3;
@@ -258,36 +274,73 @@
        * @param password
        **/
       async passSubmit(password) {
+        let transferInfo = {
+          fromAddress: this.addressInfo.address,
+          assetsChainId: 2,
+          assetsId: 1,
+          amount: Number(Times(this.jionNodeForm.amount, 100000000).toString()),
+          fee: countFee()
+        };
+        let inOrOutputs = {};
+        let txhex = '';
+        let pri = nuls.decrypteOfAES(this.addressInfo.aesPri, password);
+        let pub = this.addressInfo.pub;
+        let remark = '';
+        if (this.passwordType === 0) { //加入共识
+          inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 5);
+          let depositInfo = {
+            address: this.addressInfo.address,
+            agentHash: this.$route.query.hash,
+            deposit: Number(Times(this.jionNodeForm.amount, 100000000).toString())
+          };
+          if (inOrOutputs.success) {
+            txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 5, depositInfo);
+          } else {
+            this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
+          }
+        } else if (this.passwordType === 1) { //退出共识
+          transferInfo.amount = Number(Times(this.outInfo.amount, 100000000).toString());
+          transferInfo.depositHash = this.$route.query.hash;
+          inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 6);
+          if (inOrOutputs.success) {
+            txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.$route.query.hash);
+          } else {
+            this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
+          }
+        } else if (this.passwordType === 2) { //注销节点
 
-        let inputs = [];
-        let outputs = [];
-        let amount = Times(this.jionNodeForm.amount, 100000000);
-        let fee = Times(this.fee, 100000000);
-
-        if(this.passwordType ===0){ //加入共识
-
-        }else if(this.passwordType ===1){ //退出共识
-
-        }else if(this.passwordType ===2) { //注销节点
-
-        }else {
+        } else {
           console.log("交易类型错误")
         }
 
+        console.log(txhex);
+        await validateAndBroadcast(txhex).then((response) => {
+          if (response.success) {
+            //console.log(response.hash);
+            this.$router.push({
+              name: "txList"
+            })
+          } else {
+            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
+          }
+        }).catch((err) => {
+          this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
+        });
 
-        if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
+
+        /*if (this.balanceInfo.balance < Number(Plus(amount + fee).toString())) {
           return {success: false, data: "Your balance is not enough."}
         }
         //组装input
         if (this.jionNode) {
 
         } else {
-          console.log(Number(Times(this.outInfo.amount,100000000).toString()));
+          console.log(Number(Times(this.outInfo.amount, 100000000).toString()));
           inputs.push({
             address: this.addressInfo.address,
             assetsChainId: 2,
             assetsId: 1,
-            amount: Number(Times(this.outInfo.amount,100000000).toString()),
+            amount: Number(Times(this.outInfo.amount, 100000000).toString()),
             locked: -1,
             nonce: this.outInfo.txHash.substring(this.outInfo.txHash.length - 16)//这里是hash的最后16个字符
           });
@@ -299,7 +352,7 @@
             address: this.addressInfo.address, assetsChainId: 2,
             assetsId: 1, amount: Number(amount.toString()), lockTime: -1
           });
-        }else {
+        } else {
           outputs.push({
             address: this.addressInfo.address, assetsChainId: 2,
             assetsId: 1, amount: Number(Times(Minus(this.outInfo.amount, 0.001), 100000000).toString()), lockTime: -1
@@ -328,19 +381,20 @@
           tt.setCoinData(inputs, outputs);
           tt.remark = "";
           sdk.signatureTx(tt, sdk.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub);
-          txhex = tt.txSerialize().toString('hex');
-        }
+          txhex = tt.txSerialize().toString('hex');*/
+      }
 
-        this.validateTx(txhex);
-      },
+      //this.validateTx(txhex);
+    },
 
-      /**
-       * 获取转出账户余额信息
-       *  @param assetsId
-       *  @param address
-       **/
-      async getNulsBalance(assetsId = 1, address) {
-        await this.$post('/', 'getAccountBalance', [assetsId, address])
+    /**
+     * 获取转出账户余额信息
+     *  @param assetsId
+     *  @param address
+     **/
+    async getNulsBalance(assetsId = 1, address) {
+      await
+        this.$post('/', 'getAccountBalance', [assetsId, address])
           .then((response) => {
             //console.log(response);
             if (response.hasOwnProperty("result")) {
@@ -350,15 +404,16 @@
           .catch((error) => {
             console.log("getAccountBalance:" + error)
           });
-      },
+    },
 
-      /**
-       * 验证交易
-       *  @param txHex
-       **/
-      async validateTx(txHex) {
-        //console.log(txHex);
-        await this.$post('/', 'validateTx', [txHex])
+    /**
+     * 验证交易
+     *  @param txHex
+     **/
+    async validateTx(txHex) {
+      //console.log(txHex);
+      await
+        this.$post('/', 'validateTx', [txHex])
           .then((response) => {
             console.log(response);
             if (response.hasOwnProperty("result")) {
@@ -374,14 +429,15 @@
           .catch((error) => {
             console.log("validateTx:" + error);
           });
-      },
+    },
 
-      /**
-       * 广播交易
-       *  @param txHex
-       **/
-      async broadcastTx(txHex) {
-        await this.$post('/', 'broadcastTx', [txHex])
+    /**
+     * 广播交易
+     *  @param txHex
+     **/
+    async broadcastTx(txHex) {
+      await
+        this.$post('/', 'broadcastTx', [txHex])
           .then((response) => {
             console.log(response);
             if (response.hasOwnProperty("result")) {
@@ -393,9 +449,10 @@
           .catch((error) => {
             console.log("broadcastTx:" + error)
           });
-      },
-    }
+    },
   }
+
+
 </script>
 
 <style lang="less">

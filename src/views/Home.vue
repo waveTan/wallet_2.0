@@ -3,11 +3,11 @@
     <h3 class="title" v-if="addressInfo">
       {{addressInfo.address}}
       <span v-show="addressInfo.alias">({{addressInfo.alias}})</span>
-      <i class="iconfont icon-fuzhi clicks" @click="copy(addressInfo.address)"></i>
+      <i class="iconfont iconfuzhi clicks" @click="copy(addressInfo.address)"></i>
     </h3>
     <el-tabs v-model="homeActive" @tab-click="handleClick" class="w1200">
       <el-tab-pane label="主网资产" name="homeFirst" v-loading="assetsListLoading">
-        <el-select v-model="assetsValue" @change="channgeAsesets">
+        <el-select v-model="assetsValue" @change="channgeAsesets" disabled>
           <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>

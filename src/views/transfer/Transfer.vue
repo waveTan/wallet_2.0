@@ -9,7 +9,7 @@
         </el-form-item>
         <el-form-item label="收款地址:" prop="toAddress">
           <el-input v-model="transferForm.toAddress">
-            <i class="el-icon-edit el-input__icon" slot="suffix"></i>
+            <i class="iconfont iconlianxiren click" slot="suffix"></i>
           </el-input>
         </el-form-item>
         <el-form-item label="资产类型:">
@@ -77,7 +77,6 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
-  import sdk from 'nuls-sdk-js/lib/api/sdk';
   import {timesDecimals, RightShiftEight, Plus, Times} from '@/api/util'
   import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import Password from '@/components/PasswordBar'
@@ -229,7 +228,7 @@
         if (inOrOutputs.success) {
           txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
         } else {
-          this.$message({message: "input or outputs ：" + inOrOutputs.data, type: 'error', duration: 1000});
+          this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
         }
         //console.log(txhex);
         //验证并广播交易

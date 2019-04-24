@@ -11,8 +11,8 @@
     <div class="w1200">
       <div v-loading="txListDataLoading">
         <div class="filter">
-          <el-select v-model="assetsValue">
-            <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
+          <el-select v-model="assetsValue" disabled>
+            <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value" >
             </el-option>
           </el-select>
           <el-select v-model="typeValue">
@@ -41,7 +41,7 @@
           <el-table-column prop="createTime" label="时间" align="center">
           </el-table-column>
           <el-table-column label="金额" align="center">
-            <template slot-scope="scope"><span :class="scope.row.transferType === 1 ? 'fCN':'fred'">{{scope.row.amount*scope.row.transferType}}</span></template>
+            <template slot-scope="scope"><span :class="scope.row.transferType === -1 ? 'fred':'fCN'">{{scope.row.amount*scope.row.transferType}}</span></template>
           </el-table-column>
           <el-table-column prop="balance" label="余额" align="center">
           </el-table-column>

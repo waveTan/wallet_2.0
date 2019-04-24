@@ -21,10 +21,10 @@
       <div class="tool">
         <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
           <el-submenu index="address" class="user">
-            <template slot="title"><i class="iconfont icon-zhanghu_icon"></i></template>
+            <template slot="title"><i class="iconfont iconzhanghu"></i></template>
 
             <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
-              <i class="el-icon-check" :class="item.selection ? '' : 'transparent' "></i>
+              <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
               {{item.address}}<span v-show="item.alias">({{item.alias}})</span>
             </el-menu-item>
             <el-menu-item index="address" class="tc">more</el-menu-item>

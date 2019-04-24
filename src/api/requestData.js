@@ -28,7 +28,7 @@ export function countFee() {
 }
 
 /**
- * 获取inputs 、 outputs
+ * 获取inputs and outputs
  * @param transferInfo
  * @param balanceInfo
  * @param type
