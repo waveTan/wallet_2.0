@@ -9,10 +9,10 @@
       <div class="card-info left fl">
         <h5 class="card-title font18">我的共识</h5>
         <ul>
-          <li>总委托 <label><u class="td click" @click="toUrl('consensusList')">123456.123456</u><span
+          <li>总委托 <label><u class="td click" @click="toUrl('consensusList')">{{addressInfo.consensusLock}}</u><span
                   class="fCN">NULS</span></label></li>
           <li>可用余额 <label>{{addressInfo.balance}}<span class="fCN">NULS</span></label></li>
-          <li>总共识奖励 <label>123456.123456<span class="fCN">NULS</span></label></li>
+          <li>总共识奖励 <label>{{addressInfo.totalReward}}<span class="fCN">NULS</span></label></li>
         </ul>
       </div>
       <div class="card-info right fr">
@@ -34,18 +34,15 @@
           <SelectBar v-model="nodeTypeRegion" :typeOptions="nodeTypeOptions" typeName="nodeType"
                      @change="changeNodeType">
           </SelectBar>
-
           <el-input placeholder="请选择输入ID\别名\地址...." class="search" v-model="search" suffix-icon="el-icon-search">
             <i class="iconfont icon-search_icon fr click"></i>
           </el-input>
-
         </div>
-
         <div class="node">
           <div class="node_info" v-for="item in allNodeData" :key="item.agentId">
             <h4 class="bg-gray">
-              <i class="iconfont iconwo"></i>
-              <span class="uppercase">{{item.agentId}}</span>
+              <i class="iconfont iconwo"></i>&nbsp;
+              <span class="uppercase">{{item.agentId}}</span>&nbsp;
               <i class="iconfont" :class="item.type ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
               <i class="follow el-icon-star-off"></i>
             </h4>
@@ -60,93 +57,27 @@
           </div>
           <div class="cb"></div>
         </div>
-
       </el-tab-pane>
       <el-tab-pane label="我的节点" name="consensusSecond">
-        <!--<div class="filter">
-          <el-select v-model="value" placeholder="资产类型">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select v-model="value" placeholder="资产类型">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-
-          <el-input placeholder="请选择输入ID\别名\地址...." class="search" v-model="search" suffix-icon="el-icon-search">
-            <i class="iconfont icon-search_icon fr click"></i>
-          </el-input>
-
-        </div>-->
-
         <div class="node">
-          <div class="node_info">
+          <div class="node_info" v-for="item in myNodeData" :key="item.agentId">
             <h4 class="bg-gray">
-              <i class="el-icon-check"></i>
-              8FDFSF6SDF
-              <i class="el-icon-edit-outline"></i>
+              <i class="iconfont iconwo"></i>&nbsp;
+              <span class="uppercase">{{item.agentId}}</span>&nbsp;
+              <i class="iconfont" :class="item.type ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
               <i class="follow el-icon-star-off"></i>
             </h4>
-            <ul class="bg-white">
-              <li>别名<span>wave</span></li>
-              <li>佣金比例 <span>10%</span></li>
-              <li>总委托量<span>87654321.32145678</span></li>
-              <li>参与人数<span>50</span></li>
-              <li>保证金<span>5000000</span></li>
-              <li>信用值<span>0.8</span></li>
-            </ul>
-          </div>
-          <div class="node_info">
-            <h4 class="bg-gray">
-              <i class="el-icon-check"></i>
-              8FDFSF6SDF
-              <i class="el-icon-edit-outline"></i>
-              <i class="follow el-icon-star-off"></i>
-            </h4>
-            <ul class="bg-white">
-              <li>别名<span>wave</span></li>
-              <li>佣金比例 <span>10%</span></li>
-              <li>总委托量<span>87654321.32145678</span></li>
-              <li>参与人数<span>50</span></li>
-              <li>保证金<span>5000000</span></li>
-              <li>信用值<span>0.8</span></li>
-            </ul>
-          </div>
-          <div class="node_info">
-            <h4 class="bg-gray">
-              <i class="el-icon-check"></i>
-              8FDFSF6SDF
-              <i class="el-icon-edit-outline"></i>
-              <i class="follow el-icon-star-off"></i>
-            </h4>
-            <ul class="bg-white">
-              <li>别名<span>wave</span></li>
-              <li>佣金比例 <span>10%</span></li>
-              <li>总委托量<span>87654321.32145678</span></li>
-              <li>参与人数<span>50</span></li>
-              <li>保证金<span>5000000</span></li>
-              <li>信用值<span>0.8</span></li>
-            </ul>
-          </div>
-          <div class="node_info">
-            <h4 class="bg-gray">
-              <i class="el-icon-check"></i>
-              8FDFSF6SDF
-              <i class="el-icon-edit-outline"></i>
-              <i class="follow el-icon-star-off"></i>
-            </h4>
-            <ul class="bg-white">
-              <li>别名<span>wave</span></li>
-              <li>佣金比例 <span>10%</span></li>
-              <li>总委托量<span>87654321.32145678</span></li>
-              <li>参与人数<span>50</span></li>
-              <li>保证金<span>5000000</span></li>
-              <li>信用值<span>0.8</span></li>
+            <ul class="bg-white click" @click="toUrl('consensusInfo',item.txHash)">
+              <li>别名<span>{{item.agentAlias}}</span></li>
+              <li>佣金比例 <span>{{item.commissionRate}}%</span></li>
+              <li>总委托量<span>{{item.totalDeposit}}</span></li>
+              <li>参与人数<span>{{item.depositCount}}</span></li>
+              <li>保证金<span>{{item.deposit}}</span></li>
+              <li>信用值<span>{{item.creditValue}}</span></li>
             </ul>
           </div>
           <div class="cb"></div>
         </div>
-
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -160,16 +91,11 @@
     name: 'consensus',
     data() {
       return {
-        consensusActive: 'consensusFirst',
+        consensusActive: 'consensusSecond',
         //节点信息
-        nodeCount: {
-          agentCount: 0,
-          totalCount: 0
-        },
+        nodeCount: {agentCount: 0, totalCount: 0},
         //nuls 信息
-        nulsCount: {
-          consensusTotal: 0
-        },
+        nulsCount: {consensusTotal: 0},
         //排序下拉框选择列表
         nodeTypeOptions: [
           {value: 0, label: '0'},
@@ -197,6 +123,7 @@
         pageSize: 20, //每页条数
         pageTotal: 0,//总页数
         type: 0, //交易类型，type=0时，返回所有交易
+        myNodeData: [],//我的节点信息
       };
     },
     components: {
@@ -213,27 +140,27 @@
     },
     mounted() {
       this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
+      this.getConsensusInfoByAddress(this.pageIndex, this.pageSize, this.addressInfo.address);
     },
     methods: {
 
       /**
        * 根据地址获取共识信息
+       * @param pageIndex
+       * @param pageSize
        * @param address
-       * TODO 待实现
        **/
-      getConsensusInfoByAddress(address) {
-        this.$post('/', 'getConsensusNodes', [address])
+      getConsensusInfoByAddress(pageIndex, pageSize, address) {
+        this.$post('/', 'getAccountConsensus', [pageIndex, pageSize, address])
           .then((response) => {
-            console.log(address);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
-              //addressInfo.balance = timesDecimals(response.result.balance);
+              this.myNodeData = response.result.list
             }
-            //localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })
           .catch((error) => {
             console.log(error);
           });
-
       },
 
       /**
@@ -291,7 +218,7 @@
       getConsensusNodes(pageIndex, pageSize, type) {
         this.$post('/', 'getConsensusNodes', [pageIndex, pageSize, type])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.deposit = timesDecimals(itme.deposit);
@@ -367,8 +294,16 @@
         this.$message({message: "已经复制完成", type: 'success', duration: 1000});
       },
 
-      handleClick(tab, event) {
-        console.log(tab, event);
+      /**
+       * tab 切换
+       * @param tab
+       */
+      handleClick(tab) {
+        if (tab.name === 'consensusFirst') {
+          this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
+        } else {
+          this.getConsensusInfoByAddress(this.pageIndex, this.pageSize, this.addressInfo.address);
+        }
       }
     }
   }
@@ -378,7 +313,6 @@
   @import "./../../assets/css/style";
 
   .consensus {
-
     .card {
       margin: -20px auto 0;
       height: 200px;
@@ -424,6 +358,5 @@
         }
       }
     }
-
   }
 </style>

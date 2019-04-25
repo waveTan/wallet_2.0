@@ -13,8 +13,8 @@
         </el-table-column>
         <el-table-column label="别名" align="center">
           <template slot-scope="scope">
-            <span v-show="scope.row.alias !=='' ">{{scope.row.alias}}</span>
-            <span v-show="scope.row.alias ==='' " @click="addAlias(scope.row)">
+            <span v-show="scope.row.alias">{{scope.row.alias}}</span>
+            <span v-show="!scope.row.alias" @click="addAlias(scope.row)">
               <i class="el-icon-edit-outline click"></i>
             </span>
           </template>
@@ -130,20 +130,24 @@
        * 获取地址网络信息
        * @param addressInfo
        **/
-      getAddressInfoByNode(addressInfo) {
+      async getAddressInfoByNode(addressInfo) {
         addressInfo.alias = "";
         addressInfo.balance = 0;
-        this.$post('/', 'getAccount', [addressInfo.address])
+        addressInfo.consensusLock = 0;
+        addressInfo.totalReward = 0;
+        await this.$post('/', 'getAccount', [addressInfo.address])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               addressInfo.alias = response.result.alias;
               addressInfo.balance = timesDecimals(response.result.balance);
+              addressInfo.consensusLock = timesDecimals(response.result.consensusLock);
+              addressInfo.totalReward = timesDecimals(response.result.totalReward);
             }
             localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })
           .catch((error) => {
-            console.log("getAccount:"+error);
+            console.log("getAccount:" + error);
             localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           });
 
@@ -153,9 +157,11 @@
        * 循环获取账户余额及别名
        * @param addressList
        **/
-      async getAddressLists(addressList) {
+      getAddressLists(addressList) {
         for (let item of addressList) {
-          await this.getAddressInfoByNode(item);
+          setTimeout(() => {
+            this.getAddressInfoByNode(item);
+          }, 500);
         }
       },
 
@@ -191,7 +197,7 @@
        **/
       passSubmit(password) {
         const pri = nuls.decrypteOfAES(this.selectAddressInfo.aesPri, password);
-        const newAddressInfo = nuls.importByKey(pri);
+        const newAddressInfo = nuls.importByKey(2, pri, password);
         if (newAddressInfo.address === this.selectAddressInfo.address) {
           localStorage.removeItem(this.selectAddressInfo.address);
           this.getAddressList();

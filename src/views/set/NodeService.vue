@@ -23,7 +23,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pages">
+      <div class="pages" v-show="false">
         <div class="page-total">显示1-20 共 1000</div>
         <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" class="fr"
                        :current-page="currentPage4"
@@ -95,7 +95,7 @@
         ],
         currentPage4: 4,
         //弹框
-        nodeServiceDialog: true,
+        nodeServiceDialog: false,
         nodeServiceForm: {
           name: '',
           urls: '',

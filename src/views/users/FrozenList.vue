@@ -2,7 +2,7 @@
   <div class="frozen_list bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包</p>
+        <BackBar backTitle="钱包"></BackBar>
         <h3 class="title">冻结列表</h3>
       </div>
     </div>
@@ -41,26 +41,18 @@
 <script>
   import moment from 'moment'
   import {timesDecimals, getLocalTime, superLong} from '@/api/util'
+  import BackBar from '@/components/BackBar'
+
   export default {
     data() {
       return {
-        txListData: [
-          /*{
-            transType: 1,
-            txid: '0020d5baee9d298e2d53....2e8699d94e05ace7c1c3',
-            time: '2019-03-27 11:57:30',
-            heightTime: 565856,
-            freezing: '共识锁定'
-          },*/
-        ],
-
+        txListData: [],//冻结列表
         pageIndex: 1, //页码
         pageSize: 20, //每页条数
         pageTotal: 0,//总页数
         addressInfo: [], //账户信息
         type: 0, //交易类型，type=0时，返回所有交易
         isHidden: false, //是否隐藏共识奖励交易，默认是不隐藏，这个参数只能是type=0时有效
-
         currentPage4: 4,
       };
     },
@@ -76,8 +68,10 @@
     mounted() {
       this.getTxListByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHidden);
     },
+    components: {
+      BackBar
+    },
     methods: {
-
       /**
        * 获取地址的交易列表
        * @param pageIndex
@@ -89,7 +83,7 @@
       getTxListByAddress(pageIndex, pageSize, address, type, isHidden) {
         this.$post('/', 'getAccountTxs', [pageIndex, pageSize, address, type, isHidden])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
@@ -109,15 +103,16 @@
 
       },
 
-
       /**
        * 连接跳转
        * @param name
+       * @param param
        */
-      toUrl(name) {
+      toUrl(name,param) {
         //console.log(name)
         this.$router.push({
-          name: name
+          name: name,
+          query: {'hash': param}
         })
       },
 
