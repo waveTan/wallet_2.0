@@ -153,13 +153,13 @@
       getConsensusInfoByAddress(pageIndex, pageSize, address) {
         this.$post('/', 'getAccountConsensus', [pageIndex, pageSize, address])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               this.myNodeData = response.result.list
             }
           })
           .catch((error) => {
-            console.log(error);
+            console.log("getAccountConsensus:"+error);
           });
       },
 

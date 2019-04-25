@@ -50,7 +50,7 @@
 <script>
   import nuls from 'nuls-sdk-js'
   import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
-  import {Times, Plus} from '@/api/util'
+  import {Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
 
   export default {

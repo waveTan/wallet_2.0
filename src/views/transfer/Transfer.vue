@@ -77,7 +77,7 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
-  import {timesDecimals, RightShiftEight, Plus, Times} from '@/api/util'
+  import {RightShiftEight, Times} from '@/api/util'
   import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import Password from '@/components/PasswordBar'
 
@@ -233,9 +233,9 @@
         //console.log(txhex);
         //验证并广播交易
         await validateAndBroadcast(txhex).then((response) => {
-          if(response.success){
+          if (response.success) {
             this.toUrl("txList");
-          }else {
+          } else {
             this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
           }
         }).catch((err) => {

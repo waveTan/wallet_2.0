@@ -28,7 +28,7 @@
         </div>
         <el-table :data="txListData" stripe border>
           <el-table-column label="资产" align="center" width="100">
-            <template slot-scope="scope"><span>NULS</span></template>
+            <template><span>NULS</span></template>
           </el-table-column>
           <el-table-column label="类型" align="center" width="100">
             <template slot-scope="scope"><span>{{ $t('type.'+scope.row.type) }}</span></template>

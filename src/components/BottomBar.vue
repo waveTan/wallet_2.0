@@ -2,7 +2,7 @@
   <div class="bottom">
     <div class="w1200 font14">
       <div class="left fl">
-        <p class="fl">节点服务器: <u class="clicks" @click="toUrl('nodeService')">http://apiserver.nuls.io</u></p>
+        <p class="fl">节点服务器: <u class="clicks" @click="toUrl('nodeService')">{{serviceUrls}}</u></p>
         <!--<p class="fr">高度:节点131000000/主网 {{heightInfo.height}}</p>-->
         <p class="fr">主网高度: {{heightInfo.height}}</p>
       </div>
@@ -20,16 +20,30 @@
     name: "bottom-bar",
     data() {
       return {
-        heightInfo:[],
+        heightInfo: [],//最新高度
+        serviceUrls: localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.192:18003/'
       }
     },
     created() {
       this.getBestBlockHeader();
+      this.serviceUrls = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.192:18003/';
+      setInterval(() => {
+        this.serviceUrls = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.192:18003/';
+      }, 500);
     },
     mounted() {
       setInterval(() => {
         this.getBestBlockHeader();
       }, 10000);
+    },
+    watch: {
+      serviceUrls(val, old) {
+        if (val) {
+          if (val !== old && old) {
+            this.getBestBlockHeader();
+          }
+        }
+      }
     },
     methods: {
 

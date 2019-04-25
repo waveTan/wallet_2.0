@@ -98,7 +98,7 @@
   import moment from 'moment'
   import nuls from 'nuls-sdk-js'
   import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast, agentDeposistList} from '@/api/requestData'
-  import {timesDecimals, getLocalTime, Times, Plus, Minus} from '@/api/util'
+  import {timesDecimals, getLocalTime, Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
 
