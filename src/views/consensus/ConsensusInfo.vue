@@ -328,9 +328,10 @@
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 9);
           if (inOrOutputs.success) {
             let newInputs = inOrOutputs.data.inputs;
-            let newOutputs = inOrOutputs.data.outputs;
+            let outputs = [];
             const depositList = await agentDeposistList(this.$route.query.hash);
             for (let itme of depositList.list) {
+              //console.log(itme.address);
               newInputs.push({
                 address: itme.address,
                 assetsChainId: 2,
@@ -339,13 +340,40 @@
                 locked: -1,
                 nonce: itme.txHash.substring(itme.txHash.length - 16)//这里是hash的最后16个字符
               });
-              newOutputs.push({
-                address: itme.address, assetsChainId: 2,
-                assetsId: 1, amount: itme.amount, lockTime: 0
+              outputs.push({
+                address: itme.address,
+                assetsChainId: 2,
+                assetsId: 1,
+                amount: itme.amount,
+                lockTime: 0
               });
             }
+
+            let addressArr = [];
+            let newOutputs = [];
+            outputs.forEach(function (item) {
+              let i;
+              if ((i = addressArr.indexOf(item.address)) > -1) {
+                //console.log(result, i);
+                newOutputs[i].amount = Number(newOutputs[i].amount) + Number(item.amount);
+              } else {
+                addressArr.push(item.address);
+                newOutputs.push({
+                  address: item.address,
+                  amount: item.amount,
+                  assetsChainId: item.assetsChainId,
+                  assetsId: item.assetsId,
+                  lockTime: item.lockTime,
+                })
+              }
+            });
+            newOutputs.unshift(inOrOutputs.data.outputs[0]);
+            /*console.log(inOrOutputs.data.outputs);
+            console.log(newInputs);
+            console.log(newOutputs);*/
             txhex = await nuls.transactionSerialize(pri, pub, newInputs, newOutputs, remark, 9, this.$route.query.hash);
-          } else {
+          }
+          else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
           }
         } else {

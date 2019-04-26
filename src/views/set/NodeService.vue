@@ -37,6 +37,7 @@
                :visible.sync="nodeServiceDialog"
                :close-on-click-modal="false"
                :close-on-press-escape="false"
+               v-loading="nodeServiceDialogLoading"
     >
       <span>您输入的非官方地址可能无法正常使用，因此造成的损失将由您自己承担</span>
 
@@ -49,7 +50,11 @@
             <el-input type="text" v-model="nodeServiceForm.urls" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item class="btns tl">
-            <el-button type="success" @click="submitForm('nodeServiceForm')">测试连接</el-button>
+            <el-button type="success" class="fl" @click="testSubmitForm('nodeServiceForm')">测试连接</el-button>
+            <div class="fl ml_50" v-show="testInfo">
+              <i :class="testInfo === '0' ? 'el-icon-circle-check fCN' : 'el-icon-circle-close fred' "></i>&nbsp;
+              <span v-show="testInfo !== '0'" class="fred font12">{{testInfo}}</span>
+            </div>
           </el-form-item>
           <el-form-item>
             <el-radio-group v-model="nodeServiceForm.resource">
@@ -57,7 +62,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item class="btns tc">
-            <el-button>取 消</el-button>
+            <el-button @click="resetForm('nodeServiceForm')">取 消</el-button>
             <el-button type="success" @click="submitForm('nodeServiceForm')">确 定</el-button>
           </el-form-item>
           <div class="cb"></div>
@@ -75,6 +80,8 @@
       let checkName = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('名称不能为空'));
+        } else {
+          callback();
         }
       };
       let validateUrls = (rule, value, callback) => {
@@ -86,18 +93,23 @@
       };
       return {
         loading: false,//切换时加载动画
-        nodeServiceData: [
+        defaultData: [
           {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 1, isDelete: false},
           {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 0, isDelete: false},
         ],
-        nodeServiceLoading: true,
-        //弹框
-        nodeServiceDialog: false,
+        //节点列表
+        nodeServiceData: [],
+        nodeServiceLoading: true,//节点列表加载动画
+        nodeServiceDialog: false,//服务地址弹框
+        nodeServiceDialogLoading: false,//服务地址弹框加载动画
+        testInfo: '',
+        //添加、编辑表单
         nodeServiceForm: {
-          name: '',
-          urls: '',
+          name: '测试连接',
+          urls: 'http://192.168.1.182:18003/',
           resource: ''
         },
+        //表单验证
         nodeServiceRules: {
           name: [
             {validator: checkName, trigger: 'blur'}
@@ -105,11 +117,15 @@
           urls: [
             {validator: validateUrls, trigger: 'blur'}
           ]
-        }
+        },
       };
     },
 
     created() {
+      this.nodeServiceData = localStorage.hasOwnProperty('urlsData') ? JSON.parse(localStorage.getItem('urlsData')) : this.defaultData;
+      setInterval(() => {
+        this.nodeServiceData = localStorage.hasOwnProperty('urlsData') ? JSON.parse(localStorage.getItem('urlsData')) : this.defaultData;
+      }, 500);
       this.getDelay();
     },
     mounted() {
@@ -121,16 +137,20 @@
        * 连接或断开
        **/
       editState(rows) {
-        if (rows.state === 0) {
-          this.loading = true;
-          for (let item of this.nodeServiceData) {
-            item.state = 0
+        if (rows.delay === "连接失败" || rows.delay === "请求超时") {
+          this.$message({message: "节点不可以连接", type: 'error', duration: 1000});
+        } else {
+          if (rows.state === 0) {
+            this.loading = true;
+            for (let item of this.nodeServiceData) {
+              item.state = 0
+            }
+            rows.state = 1;
+            localStorage.setItem("urls", JSON.stringify(rows));
+            setTimeout(() => {
+              this.loading = false;
+            }, 2000);
           }
-          rows.state = 1;
-          localStorage.setItem("urls", JSON.stringify(rows));
-          setTimeout(() => {
-            this.loading = false;
-          }, 2000);
         }
       },
 
@@ -159,10 +179,84 @@
               item.delay = "连接失败";
               console.log("getBestBlockHeader:" + error);
             });
-          this.nodeServiceLoading = false;
         }
+        this.nodeServiceLoading = false;
       },
 
+      /**
+       * 测试连接
+       * @param formName
+       **/
+      async testSubmitForm(formName) {
+        let that = this;
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            that.nodeServiceDialogLoading = true;
+            const params = {jsonrpc: "2.0", method: "getBestBlockHeader", "params": [2], "id": 5898};
+            axios.post(this.nodeServiceForm.urls, params)
+              .then(function (response) {
+                //console.log(response.data);
+                if (response.data.hasOwnProperty("result")) {
+                  that.testInfo = '0';
+                  that.nodeServiceDialogLoading = false;
+                } else {
+                  that.testInfo = response.data;
+                  that.nodeServiceDialogLoading = false;
+                }
+              })
+              .catch(function (error) {
+                console.log("getBestBlockHeader:" + error);
+                that.testInfo = error;
+                that.nodeServiceDialogLoading = false;
+              });
+          } else {
+            return false;
+          }
+        });
+
+      },
+
+      /**
+       * 添加节点提交
+       * @param formName
+       */
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let newNodeInfo = {
+              name: this.nodeServiceForm.name,
+              urls: this.nodeServiceForm.urls,
+              delay: '',
+              state: 0,
+              isDelete: true
+            };
+            //立即使用
+            if (this.nodeServiceForm.resource) {
+              for (let itme in this.nodeServiceData) {
+                if (this.nodeServiceData[itme].state === 1) {
+                  this.nodeServiceData[itme].state = 0
+                }
+              }
+              newNodeInfo.state = 1;
+            }
+            this.nodeServiceData.push(newNodeInfo);
+            localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+            this.getDelay();
+            this.nodeServiceDialog = false;
+            this.$refs[formName].resetFields();
+          } else {
+            return false;
+          }
+        });
+      },
+
+      /**
+       * 取消
+       **/
+      resetForm(formName) {
+        this.nodeServiceDialog = false;
+        this.$refs[formName].resetFields();
+      },
       /**
        * 连接跳转
        * @param name
@@ -173,20 +267,6 @@
           name: name
         })
       },
-
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
-      }
     }
   }
 </script>
@@ -201,11 +281,10 @@
         .bg-white {
           margin: 20px auto 0;
           padding: 20px;
-
           .btns {
             .el-form-item__content {
               .el-button {
-                width: 180px;
+                width: 130px;
                 span {
                   color: @Bcolour;
                 }
@@ -217,11 +296,8 @@
               }
             }
           }
-
         }
       }
-
     }
   }
-
 </style>

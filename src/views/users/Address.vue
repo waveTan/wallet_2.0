@@ -32,7 +32,7 @@
           <template slot-scope="scope">
             <label class="click tab_bn" @click="editPassword(scope.row)">修改密码</label>
             <span class="tab_line">|</span>
-            <label class="click tab_bn">备份</label>
+            <label class="click tab_bn" @click="backAddress(scope.row)">备份</label>
             <span class="tab_line">|</span>
             <label class="click tab_bn" @click="deleteAddress(scope.row)">移除</label>
           </template>
@@ -80,10 +80,11 @@
   export default {
     data() {
       return {
-        addressList: [],
-        remarkDialog: false,
-        //操作的地址信息
-        selectAddressInfo: '',
+        addressList: [],//地址列表
+        selectAddressInfo: '', //操作的地址信息
+        passwordType: 0,//密码框类型 0：移除 1：备份
+        remarkDialog: false,//备注弹框
+
       };
     },
     components: {
@@ -103,7 +104,7 @@
       getAddressList() {
         this.addressList = [];
         for (let i = localStorage.length - 1; i >= 0; i--) {
-          if (localStorage.getItem(localStorage.key(i)) !== 'SILENT' && localStorage.getItem(localStorage.key(i)) !== 'urls') {
+          if (localStorage.getItem(localStorage.key(i)) !== 'SILENT' && localStorage.key(i).length > 10) {
             this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
           }
         }
@@ -137,7 +138,7 @@
         addressInfo.totalReward = 0;
         await this.$post('/', 'getAccount', [addressInfo.address])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               addressInfo.alias = response.result.alias;
               addressInfo.balance = timesDecimals(response.result.balance);
@@ -183,11 +184,25 @@
       },
 
       /**
+       *  备份账户
+       * @param rowInfo
+       **/
+      backAddress(rowInfo) {
+        this.selectAddressInfo = rowInfo;
+        this.$router.push({
+          name: "newAddress",
+        })
+       /* this.passwordType = 1;
+        this.$refs.password.showPassword(true)*/
+      },
+
+      /**
        *  移除账户
        * @param rowInfo
        **/
       deleteAddress(rowInfo) {
         this.selectAddressInfo = rowInfo;
+        this.passwordType = 0;
         this.$refs.password.showPassword(true)
       },
 
@@ -198,10 +213,13 @@
       passSubmit(password) {
         const pri = nuls.decrypteOfAES(this.selectAddressInfo.aesPri, password);
         const newAddressInfo = nuls.importByKey(2, pri, password);
-        if (newAddressInfo.address === this.selectAddressInfo.address) {
-          localStorage.removeItem(this.selectAddressInfo.address);
-          this.getAddressList();
+        if (this.passwordType === 0) {
+          if (newAddressInfo.address === this.selectAddressInfo.address) {
+            localStorage.removeItem(this.selectAddressInfo.address);
+            this.getAddressList();
+          }
         }
+
       },
 
       /**

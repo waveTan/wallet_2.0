@@ -122,7 +122,7 @@
       getAddressList() {
         this.addressList = [];
         for (let i = localStorage.length - 1; i >= 0; i--) {
-          if (localStorage.getItem(localStorage.key(i)) !== 'SILENT') {
+          if (localStorage.getItem(localStorage.key(i)) !== 'SILENT' && localStorage.key(i).length > 10) {
             this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
           }
         }

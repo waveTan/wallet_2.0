@@ -10,11 +10,11 @@
       <div class="w630">
         <h3 class="tc mzt_20">{{this.$route.query.address}}</h3>
         <el-form :model="passwordForm" status-icon :rules="passwordRules" ref="passwordForm" class="mb_20">
-          <el-form-item label="旧密码" prop="pass">
-            <el-input type="password" v-model="passwordForm.pass" autocomplete="off"></el-input>
+          <el-form-item label="旧密码" prop="oldPass">
+            <el-input type="password" v-model="passwordForm.oldPass" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="新密码" prop="pass">
-            <el-input type="password" v-model="passwordForm.pass" autocomplete="off"></el-input>
+          <el-form-item label="新密码" prop="newPass">
+            <el-input type="password" v-model="passwordForm.newPass" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="确认新密码" prop="checkPass">
             <el-input type="password" v-model="passwordForm.checkPass" autocomplete="off"></el-input>
@@ -35,26 +35,58 @@
 
   export default {
     data() {
-      let validatePass = (rule, value, callback) => {
+      let validateOldPass = (rule, value, callback) => {
         let patrn = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,20}$/;
         if (value === '') {
-          callback(new Error('请输入密码'));
+          callback(new Error('请旧输入密码'));
         } else if (!patrn.exec(value)) {
           callback(new Error('请输入由字母和数字组合的8-20位密码'));
         } else {
+          if (this.passwordForm.checkPass !== '') {
+            this.$refs.passwordForm.validateField('newPass');
+          }
+          callback();
+        }
+      };
+      let validateNewPass = (rule, value, callback) => {
+        let patrn = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,20}$/;
+        if (value === '') {
+          callback(new Error('请输入新密码'));
+        } else if (!patrn.exec(value)) {
+          callback(new Error('请输入由字母和数字组合的8-20位密码'));
+        } else if(this.passwordForm.oldPass === this.passwordForm.newPass){
+          callback(new Error('新密码不能和旧密码相同'));
+        }else {
           if (this.passwordForm.checkPass !== '') {
             this.$refs.passwordForm.validateField('checkPass');
           }
           callback();
         }
       };
+      let validateChechPass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入新密码'));
+        } else if (this.passwordForm.checkPass !== this.passwordForm.newPass) {
+          callback(new Error('新密码与确认新密码不一样，请重新输入'));
+        } else {
+          callback();
+        }
+      };
       return {
         passwordForm: {
-          pass: '123456asd',
+          oldPass: '',
+          newPass: '',
+          checkPass: '',
         },
         passwordRules: {
-          pass: [
-            {validator: validatePass, trigger: 'blur'}
+          oldPass: [
+            {validator: validateOldPass, trigger: 'blur'}
+          ],
+          newPass: [
+            {validator: validateNewPass, trigger: 'blur'}
+          ],
+          checkPass: [
+            {validator: validateChechPass, trigger: 'blur'}
           ]
         },
         //新建的地址信息

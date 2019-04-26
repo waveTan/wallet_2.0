@@ -237,6 +237,7 @@
 
       /**
        *  根据节点状态排序
+       *  @param type
        **/
       changeNodeStatus(type) {
         this.nodeStatusRegion = type;
@@ -245,6 +246,7 @@
 
       /**
        *  根据数据类型排序
+       *  @param type
        **/
       changeNodeType(type) {
         this.nodeTypeRegion = parseInt(type);
