@@ -97,7 +97,7 @@
 <script>
   import moment from 'moment'
   import nuls from 'nuls-sdk-js'
-  import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast, agentDeposistList} from '@/api/requestData'
+  import {getNulsBalance, inputsOrOutputs, validateAndBroadcast, agentDeposistList} from '@/api/requestData'
   import {timesDecimals, getLocalTime, Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
@@ -126,7 +126,7 @@
         pageSize: 5, //每页条数
         pageTotal: 0,//总页数
         jionNodeForm: {
-          amount: 2002
+          amount: 2018
         },
         jionNodeRules: {
           amount: [
@@ -294,7 +294,7 @@
           assetsChainId: 2,
           assetsId: 1,
           amount: Number(Times(this.jionNodeForm.amount, 100000000).toString()),
-          fee: countFee()
+          fee: 100000
         };
         let inOrOutputs = {};
         let txhex = '';
@@ -309,7 +309,9 @@
             deposit: Number(Times(this.jionNodeForm.amount, 100000000).toString())
           };
           if (inOrOutputs.success) {
-            txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 5, depositInfo);
+            let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 5, depositInfo);
+            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+            //txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 5, depositInfo);
           } else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
           }
@@ -318,7 +320,9 @@
           transferInfo.depositHash = this.outInfo.txHash;
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 6);
           if (inOrOutputs.success) {
-            txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.outInfo.txHash);
+            let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.outInfo.txHash);
+            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+            //txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.outInfo.txHash);
           } else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
           }
@@ -328,7 +332,7 @@
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 9);
           if (inOrOutputs.success) {
             let newInputs = inOrOutputs.data.inputs;
-            let outputs = inOrOutputs.data.outputs;
+            let outputs = [];
             const depositList = await agentDeposistList(this.$route.query.hash);
             for (let itme of depositList.list) {
               //console.log(itme.address);
@@ -367,10 +371,12 @@
                 })
               }
             });
-            //newOutputs.unshift(inOrOutputs.data.outputs[0]);
-            //console.log(newInputs);
-            //console.log(newOutputs);
-            txhex = await nuls.transactionSerialize(pri, pub, newInputs, newOutputs, remark, 9, this.$route.query.hash);
+            newOutputs.unshift(inOrOutputs.data.outputs[0]);
+            console.log(newInputs);
+            console.log(newOutputs);
+            let tAssemble = await nuls.transactionAssemble(newInputs, newOutputs, remark, 9, this.$route.query.hash);
+            txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
+            //txhex = await nuls.transactionSerialize(pri, pub, newInputs, newOutputs, remark, 9, this.$route.query.hash);
           }
           else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});

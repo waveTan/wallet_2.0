@@ -21,10 +21,13 @@ export async function getNulsBalance(address) {
 
 /**
  * 计算手续费
+ * @param tx
+ * @param signatrueCount 签名数量，默认为1
  **/
-export function countFee() {
-  //计算手续费 （124 + 50  * inputs.length + 38 * outputs.length + remark.bytes.length ）/1024
-  return 100000;
+export function countFee(tx, signatrueCount) {
+  let txSize = tx.txSerialize().length;
+  txSize += signatrueCount * 110;
+  return 100000 * Math.ceil(txSize / 1024);
 }
 
 /**
@@ -57,6 +60,8 @@ export async function inputsOrOutputs(transferInfo, balanceInfo, type) {
     newLocked = -1;
     newNonce = transferInfo.depositHash.substring(transferInfo.depositHash.length - 16);
     newoutputAmount = transferInfo.amount - transferInfo.fee;
+    //锁定三天
+    newLockTime = (new Date()).valueOf() + 3600000 * 72;
   } else {
     //return {success: false, data: "No transaction type"}
   }

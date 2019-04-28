@@ -23,12 +23,15 @@
         </el-form>
       </div>
     </div>
-
+    <Password ref="password" @passwordSubmit="passSubmit">
+    </Password>
   </div>
 </template>
 
 <script>
- /* import nuls from 'nuls-sdk-js'*/
+  import nuls from 'nuls-sdk-js'
+  import {inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
+  import Password from '@/components/PasswordBar'
 
   export default {
     data() {
@@ -44,18 +47,101 @@
       };
       return {
         aliasForm: {
-          alias: '',
+          alias: 'wave',
         },
         aliasRules: {
           alias: [
             {validator: validateAlias, trigger: 'blur'}
           ]
         },
-        //新建的地址信息
-        newAddressInfo: '',
+        addressInfo: '', //默认账户信息
+        balanceInfo: '',//账户余额信息
       };
     },
+    created() {
+      this.addressInfo = JSON.parse(localStorage.getItem(this.$route.query.address));
+    },
+    watch: {
+      addressInfo(val, old) {
+        if (val.address !== old.address && old.address) {
+          this.transferForm.fromAddress = this.addressInfo.address
+        }
+      }
+    },
+    components: {
+      Password,
+    },
     methods: {
+
+      /**
+       * 创建地址
+       * @param formName
+       */
+      submitAliasForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.getNulsBalance(1, this.$route.query.address);
+            this.$refs.password.showPassword(true);
+          } else {
+            return false;
+          }
+        });
+      },
+
+      /**
+       * 获取转出账户余额信息
+       *  @param assetsId
+       *  @param address
+       **/
+      async getNulsBalance(assetsId = 1, address) {
+        await this.$post('/', 'getAccountBalance', [assetsId, address])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              this.balanceInfo = {'balance': response.result.balance, 'nonce': response.result.nonce};
+              this.$refs.password.showPassword(true);
+            } else {
+              this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+            }
+          })
+          .catch((error) => {
+            this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+          });
+      },
+
+      /**
+       *  获取密码框的密码
+       * @param password
+       **/
+      async passSubmit(password) {
+
+        let transferInfo = {
+          fromAddress: this.addressInfo.address,
+          toAddress: 'tNULSeBaMkqeHbTxwKqyquFcbewVTUDHPkF11o',
+          assetsChainId: 2,
+          assetsId: 1,
+          amount: 100000000,
+          fee: 100000
+        };
+        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 3);
+        let aliasInfo = {
+          fromAddress: this.addressInfo.address,
+          alias: this.aliasForm.alias
+        };
+        let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 3, aliasInfo);
+        let txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+        console.log(txhex);
+        //验证并广播交易
+        await validateAndBroadcast(txhex).then((response) => {
+          if (response.success) {
+            this.toUrl("txList");
+          } else {
+            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
+          }
+        }).catch((err) => {
+          this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
+        });
+      },
 
       /**
        * 连接跳转
@@ -67,35 +153,6 @@
           name: name
         })
       },
-
-      /**
-       * 创建地址
-       * @param formName
-       */
-      submitAliasForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            console.log(this.aliasForm.alias);
-          } else {
-            return false;
-          }
-        });
-      },
-
-      /**
-       * 进入钱包
-       */
-      goWallet() {
-        let addressInfo = {
-          address: this.newAddressInfo.address,
-          aesPri: this.newAddressInfo.aesPri,
-          pub: this.newAddressInfo.pub,
-          alias: '',
-          remark: '',
-        };
-        localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
-        this.toUrl('home')
-      }
     }
   }
 </script>

@@ -49,7 +49,7 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
-  import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
+  import {getNulsBalance, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import {Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
 
@@ -58,13 +58,12 @@
       return {
         addressInfo: {},//账户信息
         balanceInfo: {},//账户余额信息
-        fee: 0.001,//手续费
         //创建节点表单
         createrForm: {
-          rewardAddress: 'tNULSeBaMuV8h5ksk4j4tWyG2LTRgScBUFgzbe',
-          blockAddress: 'tNULSeBaMuV8h5ksk4j4tWyG2LTRgScBUFgzbe',
-          amount: '20000',
-          rate: '10',
+          rewardAddress: '',
+          blockAddress: '',
+          amount: '',
+          rate: '',
         },
         createrRules: {
           rewardAddress: [
@@ -87,7 +86,6 @@
       setInterval(() => {
         this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
       }, 500);
-
     },
     mounted() {
 
@@ -126,7 +124,7 @@
           assetsChainId: 2,
           assetsId: 1,
           amount: Number(Times(this.createrForm.amount, 100000000).toString()),
-          fee: countFee()
+          fee: 100000
         };
         let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 4);
         let txhex = '';
@@ -138,7 +136,8 @@
             commissionRate: Number(this.createrForm.rate),
             deposit: Number(Times(this.createrForm.amount, 100000000).toString())
           };
-          txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 4, agent);
+          let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 4, agent);
+          txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
         } else {
           this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
         }

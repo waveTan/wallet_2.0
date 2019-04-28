@@ -25,7 +25,7 @@
 
             <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
               <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
-              {{item.address}}<span v-show="item.alias">({{item.alias}})</span>
+              {{item.addresss}}<span v-show="item.alias">|({{item.alias}})</span> | {{item.balance}}
             </el-menu-item>
             <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>
@@ -54,6 +54,7 @@
   import * as config from '../config.js'
   import logo from './../assets/img/logo.svg'
   import testnetLogo from './../assets/img/logo-test-black.svg'
+  import {superLong} from '@/api/util'
 
   export default {
     data() {
@@ -127,6 +128,7 @@
           }
         }
         for (let itmes of this.addressList) {
+          itmes.addresss = superLong(itmes.address,8);
           if (itmes.selection) {
             sessionStorage.clear();
             sessionStorage.setItem(itmes.address, JSON.stringify(itmes))

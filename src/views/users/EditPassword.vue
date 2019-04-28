@@ -111,7 +111,6 @@
        * @param formName
        */
       submitPasswordForm(formName) {
-        let that = this;
         this.$refs[formName].validate((valid) => {
           if (valid) {
             const pri = nuls.decrypteOfAES(this.addressInfo.aesPri, this.passwordForm.oldPass);

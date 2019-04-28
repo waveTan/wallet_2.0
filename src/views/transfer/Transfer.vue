@@ -26,7 +26,7 @@
           </el-input>
         </el-form-item>
         <el-form-item label="备注:">
-          <el-input type="textarea" v-model="transferForm.remarks">
+          <el-input type="textarea" v-model="transferForm.remarks" @change="countFee">
           </el-input>
         </el-form-item>
         <div class="font14">
@@ -118,10 +118,10 @@
         //转账数据
         transferForm: {
           fromAddress: '',
-          toAddress: 'tNULSeBaMnXoAkNEhqjYv7k7A8PEKPAmXXXVWv',
+          toAddress: 'tNULSeBaMhTidjRr5rqbXFPM6x1YnmrfM5nr7y',
           type: 'NULS',
-          amount: 88,
-          remarks: 'wave test 88 nuls',
+          amount: '50',
+          remarks: '',
         },
         //验证信息
         transferRules: {
@@ -156,6 +156,71 @@
       Password,
     },
     methods: {
+
+      /**
+       *计算手续费
+       * todo 备注字符大于200 做手续费计算
+       **/
+      countFee() {
+
+        let str = this.transferForm.remarks;
+        let len = 0;
+        for (let i = 0; i < str.length; i++) {
+          let c = str.charCodeAt(i);
+          //单字节加1
+          if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+            len++;
+          }
+          else {
+            len += 2;
+          }
+        }
+        if (len > 200) {
+          console.log(len)
+        } else {
+          console.log("len:" + len)
+        }
+
+      },
+
+      //组装交易并获取手续费
+      async txAssemble() {
+        await getNulsBalance(this.transferForm.fromAddress).then((response) => {
+          if (response.success) {
+            this.balanceInfo = response.data;
+            let transferInfo = {
+              fromAddress: this.transferForm.fromAddress,
+              toAddress: this.transferForm.toAddress,
+              assetsChainId: 2,
+              assetsId: 1,
+              amount: Number(Times(this.transferForm.amount, 100000000).toString()),
+              fee: 10000
+            };
+            let inOrOutputs = inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+            let tAssemble = [];//交易组装
+            if (inOrOutputs.success) {
+              tAssemble = nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+              //获取手续费
+              let newFee = countFee(tAssemble, 1);
+              //手续费大于0.001的时候重新组装交易及签名
+              if (transferInfo.fee !== newFee) {
+                transferInfo.fee = newFee;
+                inOrOutputs = inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+                return nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+              } else {
+                return tAssemble
+              }
+            } else {
+              this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
+            }
+          } else {
+            this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+          }
+        }).catch((error) => {
+          this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+        });
+
+      },
 
       /**
        * 转账功能下一步
@@ -221,12 +286,24 @@
           assetsChainId: 2,
           assetsId: 1,
           amount: Number(Times(this.transferForm.amount, 100000000).toString()),
-          fee: countFee()
+          fee: 10000
         };
         let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
-        let txhex = "";
+        let tAssemble = [];//交易组装
+        let txhex = "";//交易签名
         if (inOrOutputs.success) {
-          txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+          tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+          //获取手续费
+          let newFee = countFee(tAssemble, 1);
+          //手续费大于0.001的时候重新组装交易及签名
+          if (transferInfo.fee !== newFee) {
+            transferInfo.fee = newFee;
+            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+            tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+            txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+          } else {
+            txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+          }
         } else {
           this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
         }
