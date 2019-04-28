@@ -52,7 +52,7 @@
           <el-form-item class="btns tl">
             <el-button type="success" class="fl" @click="testSubmitForm('nodeServiceForm')">测试连接</el-button>
             <div class="fl ml_50" v-show="testInfo">
-              <i :class="testInfo === '0' ? 'el-icon-circle-check fCN' : 'el-icon-circle-close fred' "></i>&nbsp;
+              <i :class="testInfo === '0' ? 'el-icon-circle-check fCN' : 'el-icon-circle-close fred' "></i>&nbsp
               <span v-show="testInfo !== '0'" class="fred font12">{{testInfo}}</span>
             </div>
           </el-form-item>

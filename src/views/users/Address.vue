@@ -82,9 +82,7 @@
       return {
         addressList: [],//地址列表
         selectAddressInfo: '', //操作的地址信息
-        passwordType: 0,//密码框类型 0：移除 1：备份
         remarkDialog: false,//备注弹框
-
       };
     },
     components: {
@@ -151,7 +149,6 @@
             console.log("getAccount:" + error);
             localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           });
-
       },
 
       /**
@@ -191,9 +188,8 @@
         this.selectAddressInfo = rowInfo;
         this.$router.push({
           name: "newAddress",
+          query: {'address': rowInfo.address, 'aesPri': rowInfo.aesPri}
         })
-       /* this.passwordType = 1;
-        this.$refs.password.showPassword(true)*/
       },
 
       /**
@@ -202,7 +198,6 @@
        **/
       deleteAddress(rowInfo) {
         this.selectAddressInfo = rowInfo;
-        this.passwordType = 0;
         this.$refs.password.showPassword(true)
       },
 
@@ -213,13 +208,12 @@
       passSubmit(password) {
         const pri = nuls.decrypteOfAES(this.selectAddressInfo.aesPri, password);
         const newAddressInfo = nuls.importByKey(2, pri, password);
-        if (this.passwordType === 0) {
-          if (newAddressInfo.address === this.selectAddressInfo.address) {
-            localStorage.removeItem(this.selectAddressInfo.address);
-            this.getAddressList();
-          }
+        if (newAddressInfo.address === this.selectAddressInfo.address) {
+          localStorage.removeItem(this.selectAddressInfo.address);
+          this.getAddressList();
+        } else {
+          this.$message({message: "密码错误", type: 'error', duration: 1000});
         }
-
       },
 
       /**

@@ -195,7 +195,8 @@
         }, 200);
       } else {
         this.$router.push({
-          name: "newAddress"
+          name: "newAddress",
+          query: {'address': ''}
         })
       }
 

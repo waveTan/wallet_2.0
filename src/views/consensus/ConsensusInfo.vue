@@ -328,7 +328,7 @@
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 9);
           if (inOrOutputs.success) {
             let newInputs = inOrOutputs.data.inputs;
-            let outputs = [];
+            let outputs = inOrOutputs.data.outputs;
             const depositList = await agentDeposistList(this.$route.query.hash);
             for (let itme of depositList.list) {
               //console.log(itme.address);
@@ -367,10 +367,9 @@
                 })
               }
             });
-            newOutputs.unshift(inOrOutputs.data.outputs[0]);
-            /*console.log(inOrOutputs.data.outputs);
-            console.log(newInputs);
-            console.log(newOutputs);*/
+            //newOutputs.unshift(inOrOutputs.data.outputs[0]);
+            //console.log(newInputs);
+            //console.log(newOutputs);
             txhex = await nuls.transactionSerialize(pri, pub, newInputs, newOutputs, remark, 9, this.$route.query.hash);
           }
           else {
@@ -379,7 +378,7 @@
         } else {
           console.log("交易类型错误")
         }
-        console.log(txhex);
+        //console.log(txhex);
         await validateAndBroadcast(txhex).then((response) => {
           if (response.success) {
             console.log(response.hash);

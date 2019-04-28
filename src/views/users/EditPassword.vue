@@ -2,7 +2,7 @@
   <div class="new_address bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包管理</p>
+        <BackBar backTitle="账户管理"></BackBar>
         <h3 class="title">修改密码</h3>
       </div>
     </div>
@@ -32,6 +32,7 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
+  import BackBar from '@/components/BackBar'
 
   export default {
     data() {
@@ -54,9 +55,9 @@
           callback(new Error('请输入新密码'));
         } else if (!patrn.exec(value)) {
           callback(new Error('请输入由字母和数字组合的8-20位密码'));
-        } else if(this.passwordForm.oldPass === this.passwordForm.newPass){
+        } else if (this.passwordForm.oldPass === this.passwordForm.newPass) {
           callback(new Error('新密码不能和旧密码相同'));
-        }else {
+        } else {
           if (this.passwordForm.checkPass !== '') {
             this.$refs.passwordForm.validateField('checkPass');
           }
@@ -73,6 +74,7 @@
         }
       };
       return {
+        addressInfo: {},//默认账户信息
         passwordForm: {
           oldPass: '',
           newPass: '',
@@ -89,32 +91,42 @@
             {validator: validateChechPass, trigger: 'blur'}
           ]
         },
-        //新建的地址信息
-        newAddressInfo: '',
+        editAddressInfo: '',//新建的地址信息
       };
     },
+    created() {
+      this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
+      setInterval(() => {
+        this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
+      }, 500);
+    },
+    mounted() {},
+    components: {
+      BackBar
+    },
     methods: {
-
-      /**
-       * 连接跳转
-       * @param name
-       */
-      toUrl(name) {
-        //console.log(name)
-        this.$router.push({
-          name: name
-        })
-      },
 
       /**
        * 创建地址
        * @param formName
        */
       submitPasswordForm(formName) {
+        let that = this;
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.newAddressInfo = nuls.newAddress(this.passwordForm.pass);
-            this.isFirst = false
+            const pri = nuls.decrypteOfAES(this.addressInfo.aesPri, this.passwordForm.oldPass);
+            const newAddressInfo = nuls.importByKey(2, pri, this.passwordForm.oldPass);
+            if (newAddressInfo.address === this.addressInfo.address) {
+              const importAddressInfo = nuls.importByKey(2, pri, this.passwordForm.newPass);
+              newAddressInfo.aesPri = importAddressInfo.aesPri;
+              newAddressInfo.pub = importAddressInfo.pub;
+              localStorage.setItem(importAddressInfo.address, JSON.stringify(importAddressInfo));
+              sessionStorage.setItem(importAddressInfo.address, JSON.stringify(importAddressInfo));
+              this.$message({message: "密码修改完成", type: 'success', duration: 1000});
+              this.toUrl("address");
+            } else {
+              this.$message({message: "旧密码错误", type: 'error', duration: 1000});
+            }
           } else {
             return false;
           }
@@ -122,19 +134,14 @@
       },
 
       /**
-       * 进入钱包
+       * 连接跳转
+       * @param name
        */
-      goWallet() {
-        let addressInfo = {
-          address: this.newAddressInfo.address,
-          aesPri: this.newAddressInfo.aesPri,
-          pub: this.newAddressInfo.pub,
-          alias: '',
-          remark: '',
-        };
-        localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
-        this.toUrl('home')
-      }
+      toUrl(name) {
+        this.$router.push({
+          name: name
+        })
+      },
     }
   }
 </script>

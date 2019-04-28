@@ -2,12 +2,12 @@
   <div class="new_address bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包管理</p>
-        <h3 class="title">创建钱包</h3>
+        <BackBar backTitle="账户管理"></BackBar>
+        <h3 class="title"><font v-if="!isBackups">创建钱包</font><font v-else>备份账户</font></h3>
       </div>
     </div>
     <div class="new w1200 mt_20 bg-white">
-      <ul class="step">
+      <ul class="step" v-show="!isBackups">
         <li>
           <p class="dotted Ndotted"></p>
         </li>
@@ -59,14 +59,15 @@
         </div>
 
         <div class="btn mb_20">
-          <el-button type="success">Keystore备份</el-button>
-          <el-button type="text" @click="keyDialog=true">明文私钥备份</el-button>
-          <el-button type="info" @click="goWallet">进入钱包</el-button>
+          <el-button type="success" @click="backKeystore" disabled>Keystore备份</el-button>
+          <el-button type="text" @click="backKey">明文私钥备份</el-button>
+          <el-button type="info" @click="goWallet" v-show="!isBackups">进入钱包</el-button>
         </div>
       </div>
 
     </div>
-
+    <Password ref="password" @passwordSubmit="passSubmit">
+    </Password>
     <el-dialog title="安全警告" width="40%"
                :visible.sync="keyDialog"
                :close-on-click-modal="false"
@@ -85,6 +86,8 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
+  import Password from '@/components/PasswordBar'
+  import BackBar from '@/components/BackBar'
 
   export default {
     data() {
@@ -111,13 +114,12 @@
         }
       };
       return {
-        //第一步
-        isFirst: true,
-        //弹框
-        keyDialog: false,
+        isFirst: true,//第一步
+        isBackups: false,//备份账户
+        keyDialog: false, //弹框
         passwordForm: {
-          pass: '123456asd',
-          checkPass: '123456asd',
+          pass: '',
+          checkPass: '',
         },
         passwordRules: {
           pass: [
@@ -127,25 +129,24 @@
             {validator: validatePassTwo, trigger: 'blur'}
           ]
         },
-        //新建的地址信息
-        newAddressInfo: '',
+        newAddressInfo: {}, //新建的地址信息
       };
+    },
+    created() {
+      if (this.$route.query.address) {
+        this.isFirst = false;
+        this.isBackups = true;
+        this.newAddressInfo.address = this.$route.query.address;
+        this.newAddressInfo.aesPri = this.$route.query.aesPri;
+      }
     },
     mounted() {
     },
-
+    components: {
+      Password,
+      BackBar
+    },
     methods: {
-
-      /**
-       * 连接跳转
-       * @param name
-       */
-      toUrl(name) {
-        //console.log(name)
-        this.$router.push({
-          name: name
-        })
-      },
 
       /**
        * 创建地址
@@ -154,12 +155,42 @@
       submitPasswordForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.newAddressInfo = nuls.newAddress(2,this.passwordForm.pass);
+            this.newAddressInfo = nuls.newAddress(2, this.passwordForm.pass);
             this.isFirst = false
           } else {
             return false;
           }
         });
+      },
+
+      /**
+       * 备份keystore
+       **/
+      backKeystore() {
+        //TODO 待完善
+      },
+
+      /**
+       * 备份私钥
+       **/
+      backKey() {
+        //this.keyDialog = true;
+        this.$refs.password.showPassword(true)
+      },
+
+      /**
+       *  获取密码框的密码
+       * @param password
+       **/
+      passSubmit(password) {
+        const pri = nuls.decrypteOfAES(this.newAddressInfo.aesPri, password);
+        const newAddressInfo = nuls.importByKey(2, pri, password);
+        if (newAddressInfo.address === this.newAddressInfo.address) {
+          this.newAddressInfo.pri = pri;
+          this.keyDialog = true;
+        } else {
+          this.$message({message: "密码错误", type: 'error', duration: 1000});
+        }
       },
 
       /**
@@ -172,11 +203,22 @@
           pub: this.newAddressInfo.pub,
           alias: '',
           remark: '',
-          selection:false,
+          selection: false,
         };
         localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
         this.toUrl('address')
-      }
+      },
+
+      /**
+       * 连接跳转
+       * @param name
+       */
+      toUrl(name) {
+        //console.log(name)
+        this.$router.push({
+          name: name
+        })
+      },
     }
   }
 </script>
@@ -211,7 +253,6 @@
             }
           }
         }
-
       }
       .tip {
         margin: 40px auto;

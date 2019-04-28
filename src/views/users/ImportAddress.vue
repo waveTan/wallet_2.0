@@ -19,7 +19,7 @@
       <div class="w630" v-show="importRadio==='importKey'">
         <el-form :model="importKeyForm" status-icon :rules="importKeyRules" ref="importKeyForm" class="mb_100">
           <el-form-item label="请输入你的私钥:" prop="key">
-            <el-input type="textarea" v-model="importKeyForm.key"></el-input>
+            <el-input type="textarea" v-model.trim="importKeyForm.key"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pass">
             <el-input type="password" v-model="importKeyForm.pass" autocomplete="off"></el-input>
