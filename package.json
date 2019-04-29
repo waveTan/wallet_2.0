@@ -1,6 +1,6 @@
 {
   "name": "wallet_2.0",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,8 +19,9 @@
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "moment": "^2.24.0",
-    "nuls-sdk-js": "^2.1.6",
+    "nuls-sdk-js": "^2.1.7",
     "vue": "^2.6.6",
+    "vue-electron": "^1.0.6",
     "vue-i18n": "^8.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
@@ -64,7 +65,7 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "publist": [
+  "publish": [
     {
       "provider": "generic",
       "url": "https://47.91.237.204/home/nuls/bolang/"

@@ -4,9 +4,9 @@ export const API_CHAIN_ID = 2;
 export const RUN_DEV = false;
 //正式、测试网络的api
 //const API_URL = RUN_DEV ? 'http://192.168.1.192:18003/' : 'http://192.168.1.37:18003/';
-let API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.192:18003/';
+let API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.37:18003/';
 setInterval(() => {
-  API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.192:18003/';
+  API_URL = localStorage.hasOwnProperty("urls") ? JSON.parse(localStorage.getItem("urls")).urls : 'http://192.168.1.37:18003/';
 }, 500);
 //Request url
 export const API_ROOT = API_URL;

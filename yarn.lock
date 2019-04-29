@@ -6337,9 +6337,9 @@ nugget@^2.0.1:
     single-line-log "^1.1.2"
     throttleit "0.0.2"
 
-nuls-sdk-js@^2.1.6:
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/nuls-sdk-js/-/nuls-sdk-js-2.1.6.tgz#731311fa038b24317b0775170f798a4b859bcd96"
+nuls-sdk-js@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/nuls-sdk-js/-/nuls-sdk-js-2.1.7.tgz#3c6c411d2d64f6dc42555ba52fa4a224fa92512c"
   dependencies:
     axios "^0.18.0"
     babel-cli "^6.26.0"
@@ -8874,6 +8874,10 @@ vue-cli-plugin-i18n@^0.5.2:
     rimraf "^2.6.3"
     vue "^2.5.16"
     vue-i18n "^8.0.0"
+
+vue-electron@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/vue-electron/-/vue-electron-1.0.6.tgz#e798e03180b8933539defe31f92e53b9242b9406"
 
 vue-eslint-parser@^2.0.3:
   version "2.0.3"

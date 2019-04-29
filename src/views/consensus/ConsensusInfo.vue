@@ -126,7 +126,7 @@
         pageSize: 5, //每页条数
         pageTotal: 0,//总页数
         jionNodeForm: {
-          amount: 2018
+          amount: ''
         },
         jionNodeRules: {
           amount: [
@@ -250,7 +250,7 @@
 
       /**
        *退出共识
-       * @param hash
+       * @param outInfo
        **/
       cancelDeposit(outInfo) {
         this.outInfo = outInfo;
@@ -329,6 +329,7 @@
         } else if (this.passwordType === 2) { //注销节点
           transferInfo.amount = this.nodeInfo.deposit;
           transferInfo.depositHash = this.$route.query.hash;
+          transferInfo.fee = 200000;
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 9);
           if (inOrOutputs.success) {
             let newInputs = inOrOutputs.data.inputs;

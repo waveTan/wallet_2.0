@@ -1,5 +1,4 @@
 'use strict';
-
 import { app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
@@ -29,6 +28,9 @@ function createWindow () {
 
   win.on('closed', () => {
     win = null
+  });
+  win.once('ready-to-show', () => {
+    win.show()
   })
 }
 

@@ -94,8 +94,8 @@
       return {
         loading: false,//切换时加载动画
         defaultData: [
-          {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 1, isDelete: false},
-          {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 0, isDelete: false},
+          {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 1, isDelete: false},
+          {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 0, isDelete: false},
         ],
         //节点列表
         nodeServiceData: [],
@@ -105,8 +105,8 @@
         testInfo: '',
         //添加、编辑表单
         nodeServiceForm: {
-          name: '测试连接',
-          urls: 'http://192.168.1.182:18003/',
+          name: '',
+          urls: '',
           resource: ''
         },
         //表单验证

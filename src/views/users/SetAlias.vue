@@ -47,7 +47,7 @@
       };
       return {
         aliasForm: {
-          alias: 'wave',
+          alias: '',
         },
         aliasRules: {
           alias: [

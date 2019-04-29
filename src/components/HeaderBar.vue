@@ -25,7 +25,7 @@
 
             <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
               <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
-              {{item.addresss}}<span v-show="item.alias">|({{item.alias}})</span> | {{item.balance}}
+              {{item.addresss}}<span v-show="item.alias"> | ({{item.alias}})</span> | <span>{{item.balance}}</span>
             </el-menu-item>
             <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>

@@ -118,9 +118,9 @@
         //转账数据
         transferForm: {
           fromAddress: '',
-          toAddress: 'tNULSeBaMhTidjRr5rqbXFPM6x1YnmrfM5nr7y',
+          toAddress: '',
           type: 'NULS',
-          amount: '50',
+          amount: '',
           remarks: '',
         },
         //验证信息

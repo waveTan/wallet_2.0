@@ -35,7 +35,7 @@
       return {
         passwordVisible: false,
         passwordForm: {
-          password: '123456asd',
+          password: '',
         },
         passwordRules: {
           password: [
