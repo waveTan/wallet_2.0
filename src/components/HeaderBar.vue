@@ -5,10 +5,10 @@
         <img class="click" :src=logoSvg>
       </div>
       <div class="nav">
-        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
+        <el-menu mode="horizontal" :default-active="navActives($route.path)" @select="handleSelect">
           <el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>
-          <el-menu-item index="transfer">{{$t('nav.transfer')}}</el-menu-item>
-          <el-menu-item index="consensus">{{$t('nav.consensus')}}</el-menu-item>
+          <el-menu-item index="transfer" :disabled="addressList.length === 0">{{$t('nav.transfer')}}</el-menu-item>
+          <el-menu-item index="consensus" :disabled="addressList.length === 0">{{$t('nav.consensus')}}</el-menu-item>
           <el-menu-item index="contract" disabled>{{$t('nav.contracts')}}</el-menu-item>
           <!--<el-submenu index="5" disabled>
             <template slot="title">{{$t('nav.application')}}</template>
@@ -19,20 +19,19 @@
         </el-menu>
       </div>
       <div class="tool">
-        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
-          <el-submenu index="address" class="user">
+        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
+          <el-submenu index="address" class="user" :disabled="addressList.length === 0">
             <template slot="title"><i class="iconfont iconzhanghu"></i></template>
-
             <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
               <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
               {{item.addresss}}<span v-show="item.alias"> | ({{item.alias}})</span> | <span>{{item.balance}}</span>
             </el-menu-item>
-            <el-menu-item index="address" class="tc">more</el-menu-item>
           </el-submenu>
-          <el-submenu index="22">
+          <el-submenu index="set">
             <template slot="title">设置</template>
-            <el-menu-item index="2-1">系统设置</el-menu-item>
-            <el-menu-item index="2-2">服务节点</el-menu-item>
+            <el-menu-item index="address" class="tc">地址管理</el-menu-item>
+            <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
+            <el-menu-item index="nodeService" class="tc">服务节点</el-menu-item>
           </el-submenu>
           <el-submenu index="lang">
             <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>
@@ -40,7 +39,7 @@
             <el-menu-item index="en">English</el-menu-item>
           </el-submenu>
           <li class="el-menu-item">|</li>
-          <el-menu-item index="24">帮助</el-menu-item>
+          <el-menu-item index="24" disabled>帮助</el-menu-item>
         </el-menu>
 
       </div>
@@ -59,14 +58,10 @@
   export default {
     data() {
       return {
-        //logo
-        logoSvg: config.RUN_DEV ? logo : testnetLogo,
-        //菜单选中
-        navActive: '1',
-        //地址列表
-        addressList: [],
-        //语言选择
-        lang: 'cn'
+        logoSvg: config.RUN_DEV ? logo : testnetLogo, //logo
+        navActive: '/',//菜单选中
+        addressList: [], //地址列表
+        lang: 'cn', //语言选择
       };
     },
     components: {},
@@ -86,27 +81,24 @@
        * @param keyPath
        */
       handleSelect(key, keyPath) {
-        //console.log(key, keyPath);
         if (keyPath.length > 1) {
           if (keyPath[0] === "address") {
-            if (keyPath[1] === "address") {
-              this.$router.push({
-                name: keyPath[1]
-              })
-            } else {
-              for (let itmes of this.addressList) {
-                //清除选中
-                if (itmes.selection) {
-                  itmes.selection = false;
-                  localStorage.setItem(itmes.address, JSON.stringify(itmes))
-                }
-                //添加选中
-                if (itmes.address === keyPath[1]) {
-                  itmes.selection = true;
-                  localStorage.setItem(itmes.address, JSON.stringify(itmes))
-                }
+            for (let itmes of this.addressList) {
+              //清除选中
+              if (itmes.selection) {
+                itmes.selection = false;
+                localStorage.setItem(itmes.address, JSON.stringify(itmes))
+              }
+              //添加选中
+              if (itmes.address === keyPath[1]) {
+                itmes.selection = true;
+                localStorage.setItem(itmes.address, JSON.stringify(itmes))
               }
             }
+          } else if (keyPath[0] === "set") {
+            this.$router.push({
+              name: keyPath[1]
+            })
           } else if (keyPath[0] === "lang") {
             this.selectLanguage(key)
           }
@@ -114,6 +106,20 @@
           this.$router.push({
             name: key
           })
+        }
+      },
+
+      /**
+       * 导航栏的选中
+       * @param val
+       **/
+      navActives(val) {
+        if (val.indexOf('/transfer') === 0) {
+          return 'transfer'
+        } else if (val.indexOf('/consensus') === 0) {
+          return 'consensus'
+        } else {
+          return 'home'
         }
       },
 
@@ -128,7 +134,7 @@
           }
         }
         for (let itmes of this.addressList) {
-          itmes.addresss = superLong(itmes.address,8);
+          itmes.addresss = superLong(itmes.address, 8);
           if (itmes.selection) {
             sessionStorage.clear();
             sessionStorage.setItem(itmes.address, JSON.stringify(itmes))

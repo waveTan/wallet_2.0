@@ -74,8 +74,8 @@
         importRadio: 'importKey',
         importKeyForm: {
           key: '',
-          pass: '123456asd',
-          checkPass: '123456asd'
+          pass: '',
+          checkPass: ''
         },
         importKeyRules: {
           pass: [

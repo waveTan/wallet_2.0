@@ -97,8 +97,8 @@
 <script>
   import moment from 'moment'
   import nuls from 'nuls-sdk-js'
-  import {getNulsBalance, inputsOrOutputs, validateAndBroadcast, agentDeposistList} from '@/api/requestData'
-  import {timesDecimals, getLocalTime, Times} from '@/api/util'
+  import {getNulsBalance, countFee, inputsOrOutputs, validateAndBroadcast, agentDeposistList} from '@/api/requestData'
+  import {timesDecimals, getLocalTime, Minus, Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
 
@@ -322,14 +322,12 @@
           if (inOrOutputs.success) {
             let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.outInfo.txHash);
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
-            //txhex = await nuls.transactionSerialize(pri, pub, inOrOutputs.data.inputs, inOrOutputs.data.outputs, remark, 6, this.outInfo.txHash);
           } else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
           }
         } else if (this.passwordType === 2) { //注销节点
           transferInfo.amount = this.nodeInfo.deposit;
           transferInfo.depositHash = this.$route.query.hash;
-          transferInfo.fee = 200000;
           inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 9);
           if (inOrOutputs.success) {
             let newInputs = inOrOutputs.data.inputs;
@@ -353,7 +351,6 @@
                 lockTime: 0
               });
             }
-
             let addressArr = [];
             let newOutputs = [];
             outputs.forEach(function (item) {
@@ -373,11 +370,14 @@
               }
             });
             newOutputs.unshift(inOrOutputs.data.outputs[0]);
-            console.log(newInputs);
-            console.log(newOutputs);
             let tAssemble = await nuls.transactionAssemble(newInputs, newOutputs, remark, 9, this.$route.query.hash);
+            let newFee = countFee(tAssemble, 1);
+            if (transferInfo.fee !== newFee) {
+              transferInfo.fee = newFee;
+              newOutputs[0].amount = Number(Minus(this.nodeInfo.deposit, newFee).toString());
+              tAssemble = await nuls.transactionAssemble(newInputs, newOutputs, remark, 9, this.$route.query.hash);
+            }
             txhex = await nuls.transactionSerialize(pri, pub, tAssemble);
-            //txhex = await nuls.transactionSerialize(pri, pub, newInputs, newOutputs, remark, 9, this.$route.query.hash);
           }
           else {
             this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});

@@ -2,7 +2,7 @@
   <div class="new_address bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <BackBar backTitle="账户管理"></BackBar>
+        <BackBar backTitle="账户管理" v-show="ifAddressInfo"></BackBar>
         <h3 class="title"><font v-if="!isBackups">创建钱包</font><font v-else>备份账户</font></h3>
       </div>
     </div>
@@ -117,6 +117,7 @@
         isFirst: true,//第一步
         isBackups: false,//备份账户
         keyDialog: false, //弹框
+        ifAddressInfo: sessionStorage.hasOwnProperty(sessionStorage.key(0)),//判断是否账户地址
         passwordForm: {
           pass: '',
           checkPass: '',
