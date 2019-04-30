@@ -1,6 +1,6 @@
 {
   "name": "wallet_2.0",
-  "version": "2.0.3",
+  "version": "2.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -68,7 +68,7 @@
   "publish": [
     {
       "provider": "generic",
-      "url": "https://47.91.237.204/home/nuls/bolang/"
+      "url": "http://192.168.1.119:8080/"
     }
   ],
   "main": "background.js"

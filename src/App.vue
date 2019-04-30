@@ -18,11 +18,27 @@
       HeaderBar,
       BottomBar
     },
-    created() {
-     /* console.log(electron.remote.app);
-      console.log(electron.remote.app.on);
-      console.log(electron.remote.app.getName());*/
-      //alert(electron.remote.app.getName());
+    created(){
+      const _this = this;
+      console.log(_this.$electron);
+      console.log("*****************");
+
+      _this.$electron.ipcRenderer.send("checkForUpdate");
+      _this.$electron.ipcRenderer.on("message", (event, text) => {
+        console.log(arguments);
+        _this.tips = text;
+        alert(text)
+      });
+      _this.$electron.ipcRenderer.on("downloadProgress", (event, progressObj)=> {
+        console.log(progressObj);
+        _this.downloadPercent = progressObj.percent || 0;
+      });
+      _this.$electron.ipcRenderer.on("isUpdateNow", () => {
+        _this.$electron.ipcRenderer.send("isUpdateNow");
+      });
+    },
+    beforeDestroy(){
+      // this.$electron.ipcRenderer.removeAll(["message", "downloadProgress", "isUpdateNow"]);
     },
     methods: {
 
