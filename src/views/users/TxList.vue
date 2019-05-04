@@ -11,19 +11,20 @@
     <div class="w1200">
       <div v-loading="txListDataLoading">
         <div class="filter">
-          <el-select v-model="assetsValue" disabled>
-            <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value" >
+          <el-select v-model="assetsValue" @change="channgeAsesets" disabled>
+            <el-option v-for="item in assetsOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="typeValue">
+          <el-select v-model="typeValue" @change="channgeType">
             <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-select v-model="inAndOutValue">
+          <el-select v-model="inAndOutValue" @change="channgeInAndOut" :disabled="type !==2">
             <el-option v-for="item in inAndOutOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
-          <el-switch v-model="isHide" active-text="" inactive-text="隐藏共识奖励" :width="35" @change="changeHide">
+          <el-switch v-model="isHide" active-text="" inactive-text="隐藏共识奖励" :width="35" @change="changeHide"
+                     v-show="type===0">
           </el-switch>
         </div>
         <el-table :data="txListData" stripe border>
@@ -41,7 +42,8 @@
           <el-table-column prop="createTime" label="时间" align="center">
           </el-table-column>
           <el-table-column label="金额" align="center">
-            <template slot-scope="scope"><span :class="scope.row.transferType === -1 ? 'fred':'fCN'">{{scope.row.amount*scope.row.transferType}}</span></template>
+            <template slot-scope="scope"><span :class="scope.row.transferType === -1 ? 'fred':'fCN'">{{scope.row.amount*scope.row.transferType}}</span>
+            </template>
           </el-table-column>
           <el-table-column prop="balance" label="余额" align="center">
           </el-table-column>
@@ -153,7 +155,7 @@
       getTxlistByAddress(pageSize, pageRows, address, type, isHide) {
         this.$post('/', 'getAccountTxs', [pageSize, pageRows, address, type, isHide])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
@@ -169,6 +171,31 @@
           .catch((error) => {
             console.log("getAccountTxs:" + error)
           })
+      },
+
+      /**
+       * 资产下拉框选择
+       * * @param e
+       **/
+      channgeAsesets(e) {
+        console.log(e)
+      },
+
+      /**
+       * 交易类型下拉框选择
+       * * @param e
+       **/
+      channgeType(e) {
+        this.type = Number(e);
+        this.getTxlistByAddress(this.pageIndex, this.pageSize, this.addressInfo.address, this.type, this.isHide);
+      },
+
+      /**
+       * 收支类型下拉框选择
+       * * @param e
+       **/
+      channgeInAndOut(e) {
+        console.log(e)
       },
 
       /**

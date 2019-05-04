@@ -9,7 +9,7 @@
         </el-form-item>
         <el-form-item label="收款地址:" prop="toAddress">
           <el-input v-model="transferForm.toAddress">
-            <i class="iconfont iconlianxiren click" slot="suffix"></i>
+            <i class="iconfont iconlianxiren click" slot="suffix" @click="showBook"></i>
           </el-input>
         </el-form-item>
         <el-form-item label="资产类型:">
@@ -162,7 +162,6 @@
        * todo 备注字符大于200 做手续费计算
        **/
       countFee() {
-
         let str = this.transferForm.remarks;
         let len = 0;
         for (let i = 0; i < str.length; i++) {
@@ -319,6 +318,15 @@
           this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
         });
       },
+
+      /**
+       * 通讯录功能
+       * TODO 待开发...
+       **/
+      showBook(){
+        this.$message({message: "开发者......" , duration: 1000});
+      },
+
 
       /**
        * 连接跳转

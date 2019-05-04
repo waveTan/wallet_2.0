@@ -9,7 +9,8 @@
 
     <div class="w1200 mt_20">
       <el-table :data="txListData" stripe border>
-        <el-table-column prop="type" label="类型" align="center">
+        <el-table-column label="类型" align="center">
+          <template slot-scope="scope"><span>{{ $t('type.'+scope.row.type) }}</span></template>
         </el-table-column>
         <el-table-column label="txHash" align="center" min-width="150">
           <template slot-scope="scope">
