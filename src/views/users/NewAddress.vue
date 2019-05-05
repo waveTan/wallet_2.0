@@ -78,7 +78,7 @@
         {{newAddressInfo.pri}}
       </p>
       <span slot="footer" class="dialog-footer">
-        <el-button type="success" @click="keyDialog = false">复制</el-button>
+        <el-button type="success" @click="copy(newAddressInfo.pri)">复制</el-button>
       </span>
     </el-dialog>
   </div>
@@ -88,6 +88,7 @@
   import nuls from 'nuls-sdk-js'
   import Password from '@/components/PasswordBar'
   import BackBar from '@/components/BackBar'
+  import {copys} from '@/api/util'
 
   export default {
     data() {
@@ -219,6 +220,16 @@
         this.$router.push({
           name: name
         })
+      },
+
+      /**
+       * 复制方法
+       * @param sting
+       **/
+      copy(sting) {
+        copys(sting);
+        this.$message({message: "已经复制完成", type: 'success', duration: 1000});
+        this.keyDialog = false;
       },
     }
   }

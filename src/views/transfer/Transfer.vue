@@ -4,11 +4,11 @@
     <div class="w1200 bg-white">
       <el-form :model="transferForm" :rules="transferRules" ref="transferForm">
         <el-form-item label="付款地址:">
-          <el-input v-model="transferForm.fromAddress" disabled>
+          <el-input v-model.trim="transferForm.fromAddress" disabled>
           </el-input>
         </el-form-item>
         <el-form-item label="收款地址:" prop="toAddress">
-          <el-input v-model="transferForm.toAddress">
+          <el-input v-model.trim="transferForm.toAddress">
             <i class="iconfont iconlianxiren click" slot="suffix" @click="showBook"></i>
           </el-input>
         </el-form-item>
@@ -25,7 +25,7 @@
           <el-input v-model="transferForm.amount">
           </el-input>
         </el-form-item>
-        <el-form-item label="备注:">
+        <el-form-item label.trim="备注:">
           <el-input type="textarea" v-model="transferForm.remarks" @change="countFee">
           </el-input>
         </el-form-item>

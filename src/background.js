@@ -70,18 +70,18 @@ if (isDevelopment) {
   const uploadUrl = "http://192.168.1.119:8080/"; // 下载地址，不加后面的**.exe
   autoUpdater.setFeedURL(uploadUrl);
   autoUpdater.on('error', function (error) {
-    console.log(error);
+    console.log("检查更新出错:"+error);
     sendUpdateMessage(message.error)
   });
   autoUpdater.on('checking-for-update', function () {
     sendUpdateMessage(message.checking)
   });
   autoUpdater.on('update-available', function (info) {
-    console.log(info);
+    console.log("检测到新版本，正在下载:"+info);
     sendUpdateMessage(message.updateAva)
   });
   autoUpdater.on('update-not-available', function (info) {
-    console.log(info);
+    console.log("现在使用的就是最新版本，不用更新:"+info);
     sendUpdateMessage(message.updateNotAva)
   });
 

@@ -8,7 +8,7 @@
     </div>
     <div class="w1200 mt_20 bg-white">
       <div class="radio">
-        <el-radio v-model="importRadio" label="importKeystore">Keystore 导入</el-radio>
+        <el-radio v-model="importRadio" label="importKeystore" disabled>Keystore 导入</el-radio>
         <el-radio v-model="importRadio" label="importKey">私钥导入</el-radio>
       </div>
 

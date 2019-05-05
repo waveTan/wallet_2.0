@@ -106,22 +106,30 @@
             this.addressList.push(JSON.parse(localStorage.getItem(localStorage.key(i))))
           }
         }
-        //循环账户智能有一个是选中的账户
-        let countSelection = 0;
-        for (let itmes of this.addressList) {
-          if (itmes.selection) {
-            countSelection++;
-            sessionStorage.setItem(itmes.address, JSON.stringify(itmes));
-            if (countSelection > 1) {
-              itmes.selection = false;
-              localStorage.setItem(itmes.address, JSON.stringify(itmes))
+        //如果没有账户跳转到创建地址界面
+        if( this.addressList.length !== 0){
+          //循环账户智能有一个是选中的账户
+          let countSelection = 0;
+          for (let itmes of this.addressList) {
+            if (itmes.selection) {
+              countSelection++;
+              sessionStorage.setItem(itmes.address, JSON.stringify(itmes));
+              if (countSelection > 1) {
+                itmes.selection = false;
+                localStorage.setItem(itmes.address, JSON.stringify(itmes))
+              }
             }
           }
-        }
-        //一个选中的都没就默认第一个
-        if (countSelection === 0) {
-          this.addressList[0].selection = true;
-          localStorage.setItem(this.addressList[0].address, JSON.stringify(this.addressList[0]))
+          //一个选中的都没就默认第一个
+          if (countSelection === 0) {
+            this.addressList[0].selection = true;
+            localStorage.setItem(this.addressList[0].address, JSON.stringify(this.addressList[0]))
+          }
+        }else {
+          this.$router.push({
+            name: "newAddress",
+            query: {'address': ''}
+          })
         }
       },
 
@@ -168,7 +176,6 @@
        * @param rowInfo
        **/
       addAlias(rowInfo) {
-        //todo
         this.toUrl('setAlias', rowInfo.address)
       },
 
@@ -210,6 +217,9 @@
         const newAddressInfo = nuls.importByKey(2, pri, password);
         if (newAddressInfo.address === this.selectAddressInfo.address) {
           localStorage.removeItem(this.selectAddressInfo.address);
+          if(sessionStorage.hasOwnProperty(this.selectAddressInfo.address)){
+            sessionStorage.removeItem(this.selectAddressInfo.address);
+          }
           this.getAddressList();
         } else {
           this.$message({message: "密码错误", type: 'error', duration: 1000});

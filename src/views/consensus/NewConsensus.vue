@@ -11,23 +11,23 @@
     <div class="w1200 bg-white mt_20">
       <el-form :model="createrForm" :rules="createrRules" ref="createrForm">
         <el-form-item label="创建地址:">
-          <el-input v-model="addressInfo.address" disabled>
+          <el-input v-model.trim="addressInfo.address" disabled>
           </el-input>
         </el-form-item>
         <el-form-item label="奖励地址:" prop="rewardAddress">
-          <el-input v-model="createrForm.rewardAddress">
+          <el-input v-model.trim="createrForm.rewardAddress">
           </el-input>
         </el-form-item>
         <el-form-item label="出块地址:" prop="blockAddress">
-          <el-input v-model="createrForm.blockAddress">
+          <el-input v-model.trim="createrForm.blockAddress">
           </el-input>
         </el-form-item>
         <el-form-item label="保证金(NULS):" prop="amount">
-          <el-input v-model="createrForm.amount">
+          <el-input v-model.trim="createrForm.amount">
           </el-input>
         </el-form-item>
         <el-form-item label="佣金比例(%):" prop="rate">
-          <el-input v-model="createrForm.rate">
+          <el-input v-model.trim="createrForm.rate">
           </el-input>
         </el-form-item>
         <div class="font14">
@@ -35,7 +35,7 @@
             <div slot="content">该手续费值是根据当前NULS网络预估的，实际消耗可能小于该值，多余部分将会通过共识奖励退回</div>
             <i class="el-icon-warning"></i>
           </el-tooltip>
-          手续费：0.02 <span class="fCN">NULS</span>
+          手续费：0.01 <span class="fCN">NULS</span>
         </div>
         <el-form-item class="form-next">
           <el-button type="success" @click="submitForm('createrForm')">确 定</el-button>

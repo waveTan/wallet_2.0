@@ -16,7 +16,10 @@
         </ul>
       </div>
       <div class="card-info right fr">
-        <h5 class="card-title font18">所有共识 <span class="font16 click fr" @click="toUrl('newConsensus')">创建</span></h5>
+        <h5 class="card-title font18">
+          所有共识
+          <span class="font16 click fr" @click="toUrl('newConsensus')" >创建</span>
+        </h5>
         <ul>
           <li>共识节点 <label>{{nodeCount.agentCount}}</label></li>
           <li>总节点数 <label>{{nodeCount.totalCount}}</label></li>
@@ -70,9 +73,9 @@
             <ul class="bg-white click" @click="toUrl('consensusInfo',item.txHash)">
               <li>别名<span>{{item.agentAlias}}</span></li>
               <li>佣金比例 <span>{{item.commissionRate}}%</span></li>
-              <li>总委托量<span>{{item.totalDeposit}}</span></li>
+              <li>总委托量<span>{{item.totalDeposit/100000000}}</span></li>
               <li>参与人数<span>{{item.depositCount}}</span></li>
-              <li>保证金<span>{{item.deposit}}</span></li>
+              <li>保证金<span>{{item.deposit/100000000}}</span></li>
               <li>信用值<span>{{item.creditValue}}</span></li>
             </ul>
           </div>
@@ -153,13 +156,13 @@
       getConsensusInfoByAddress(pageIndex, pageSize, address) {
         this.$post('/', 'getAccountConsensus', [pageIndex, pageSize, address])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               this.myNodeData = response.result.list
             }
           })
           .catch((error) => {
-            console.log("getAccountConsensus:"+error);
+            console.log("getAccountConsensus:" + error);
           });
       },
 
@@ -218,7 +221,7 @@
       getConsensusNodes(pageIndex, pageSize, type) {
         this.$post('/', 'getConsensusNodes', [pageIndex, pageSize, type])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.deposit = timesDecimals(itme.deposit);

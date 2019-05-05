@@ -114,7 +114,6 @@
        * @param password
        **/
       async passSubmit(password) {
-
         let transferInfo = {
           fromAddress: this.addressInfo.address,
           toAddress: 'tNULSeBaMkqeHbTxwKqyquFcbewVTUDHPkF11o',
@@ -130,7 +129,7 @@
         };
         let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 3, aliasInfo);
         let txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
-        console.log(txhex);
+        //console.log(txhex);
         //验证并广播交易
         await validateAndBroadcast(txhex).then((response) => {
           if (response.success) {

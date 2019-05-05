@@ -2,7 +2,11 @@ import axios from 'axios'
 import * as config from '../config.js'
 axios.defaults.timeout = config.API_TIME;
 axios.defaults.baseURL = config.API_ROOT;
+setInterval(() => {
+  axios.defaults.baseURL = config.API_ROOT;
+}, 500);
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+
 /**
  * 封装post请求
  * Encapsulation post method

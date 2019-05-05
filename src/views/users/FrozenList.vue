@@ -95,11 +95,9 @@
               this.pageTotal = response.result.totalCount;
               this.txListData = response.result.list;
             }
-            //localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));
           })
           .catch((error) => {
-            console.log(error);
-            /*localStorage.setItem(addressInfo.address, JSON.stringify(addressInfo));*/
+            console.log("getAccountTxs:"+error);
           });
 
       },

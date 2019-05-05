@@ -30,8 +30,8 @@
           <el-submenu index="set">
             <template slot="title">设置</template>
             <el-menu-item index="address" class="tc">地址管理</el-menu-item>
-            <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
             <el-menu-item index="nodeService" class="tc">服务节点</el-menu-item>
+            <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
           </el-submenu>
           <el-submenu index="lang">
             <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>

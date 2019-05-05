@@ -16,7 +16,7 @@
         </el-table-column>
         <el-table-column prop="state" label="状态" align="center">
           <template slot-scope="scope">
-            <span @click="editState(scope.row)">
+            <span @click="editState(scope.$index)">
               <i class="iconfont click" :class="scope.row.state === 0 ? 'iconduankailianjie' : 'el-icon-check'"></i>
             </span>
           </template>
@@ -24,9 +24,9 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <div v-if="scope.row.isDelete">
-              <label class="click tab_bn">修改</label>
+              <label class="click tab_bn" @click="edit(scope.$index)">修改</label>
               <span class="tab_line">|</span>
-              <label class="click tab_bn">移除</label>
+              <label class="click tab_bn" @click="removeUrl(scope.$index)">移除</label>
             </div>
           </template>
         </el-table-column>
@@ -44,10 +44,12 @@
       <div class="bg-white">
         <el-form :model="nodeServiceForm" status-icon :rules="nodeServiceRules" ref="nodeServiceForm">
           <el-form-item label="名称" prop="name">
-            <el-input v-model.number="nodeServiceForm.name"></el-input>
+            <el-input v-model.number="nodeServiceForm.name">
+            </el-input>
           </el-form-item>
           <el-form-item label="服务地址" prop="urls">
-            <el-input type="text" v-model="nodeServiceForm.urls" autocomplete="off"></el-input>
+            <el-input type="text" v-model="nodeServiceForm.urls" autocomplete="off">
+            </el-input>
           </el-form-item>
           <el-form-item class="btns tl">
             <el-button type="success" class="fl" @click="testSubmitForm('nodeServiceForm')">测试连接</el-button>
@@ -85,8 +87,11 @@
         }
       };
       let validateUrls = (rule, value, callback) => {
+        let patrn = /(http|https):\/\/([\w.]+\/?)\S*/;
         if (value === '') {
           callback(new Error('地址不能为空'));
+        } else if (!patrn.exec(value)) {
+          callback(new Error('请输入正确的连接地址'))
         } else {
           callback();
         }
@@ -94,15 +99,14 @@
       return {
         loading: false,//切换时加载动画
         defaultData: [
-          {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 1, isDelete: false},
-          {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 0, isDelete: false},
+          {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 0, isDelete: false},
+          {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 1, isDelete: false},
         ],
         //节点列表
         nodeServiceData: [],
         nodeServiceLoading: true,//节点列表加载动画
         nodeServiceDialog: false,//服务地址弹框
         nodeServiceDialogLoading: false,//服务地址弹框加载动画
-        testInfo: '',
         //添加、编辑表单
         nodeServiceForm: {
           name: '',
@@ -118,6 +122,8 @@
             {validator: validateUrls, trigger: 'blur'}
           ]
         },
+        testInfo: '',//测试连接提示信息
+        editIndex: 10000, //编辑ID
       };
     },
 
@@ -126,27 +132,28 @@
       setInterval(() => {
         this.nodeServiceData = localStorage.hasOwnProperty('urlsData') ? JSON.parse(localStorage.getItem('urlsData')) : this.defaultData;
       }, 500);
-      this.getDelay();
+
     },
     mounted() {
-
+      this.getDelay();
     },
     methods: {
 
       /**
        * 连接或断开
        **/
-      editState(rows) {
-        if (rows.delay === "连接失败" || rows.delay === "请求超时") {
+      editState(index) {
+        if (this.nodeServiceData[index].delay === "连接失败" || this.nodeServiceData[index].delay === "请求超时") {
           this.$message({message: "节点不可以连接", type: 'error', duration: 1000});
         } else {
-          if (rows.state === 0) {
+          if (this.nodeServiceData[index].state === 0) {
             this.loading = true;
             for (let item of this.nodeServiceData) {
-              item.state = 0
+              item.state = 0;
             }
-            rows.state = 1;
-            localStorage.setItem("urls", JSON.stringify(rows));
+            this.nodeServiceData[index].state = 1;
+            localStorage.setItem("urls", JSON.stringify(this.nodeServiceData[index]));
+            localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
             setTimeout(() => {
               this.loading = false;
             }, 2000);
@@ -158,6 +165,7 @@
        * 获取延迟毫秒
        **/
       async getDelay() {
+        let newData = [];
         for (let item of this.nodeServiceData) {
           if (item.state === 1) {
             localStorage.setItem("urls", JSON.stringify(item))
@@ -177,10 +185,14 @@
             })
             .catch(function (error) {
               item.delay = "连接失败";
-              console.log("getBestBlockHeader:" + error);
+              console.log(item.urls + " getBestBlockHeader:" + error);
             });
+
+          newData.push(item);
         }
+        this.nodeServiceData = newData;
         this.nodeServiceLoading = false;
+        localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
       },
 
       /**
@@ -239,8 +251,13 @@
               }
               newNodeInfo.state = 1;
             }
-            this.nodeServiceData.push(newNodeInfo);
-            localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+            if (this.editIndex !== 10000) {
+              this.nodeServiceData[this.editIndex] = newNodeInfo;
+              localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+            } else {
+              this.nodeServiceData.push(newNodeInfo);
+              localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+            }
             this.getDelay();
             this.nodeServiceDialog = false;
             this.$refs[formName].resetFields();
@@ -252,11 +269,32 @@
 
       /**
        * 取消
+       * @param formName
        **/
       resetForm(formName) {
         this.nodeServiceDialog = false;
         this.$refs[formName].resetFields();
       },
+
+      /**
+       * 编辑连接
+       * @param index
+       **/
+      edit(index) {
+        this.editIndex = index;
+        this.nodeServiceForm = this.nodeServiceData[index];
+        this.nodeServiceDialog = true;
+      },
+
+      /**
+       *移除连接
+       * @param index
+       **/
+      removeUrl(index) {
+        this.nodeServiceData.splice(index, 1);
+        localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+      },
+
       /**
        * 连接跳转
        * @param name

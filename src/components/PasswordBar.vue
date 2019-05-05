@@ -23,11 +23,8 @@
     props: {},
     data() {
       let validatePass = (rule, value, callback) => {
-        let patrn = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,20}$/;
         if (value === '') {
           callback(new Error('请输入密码'))
-        } else if (!patrn.exec(value)) {
-          callback(new Error('请输入数字及字母组合的8-20位密码'))
         } else {
           callback()
         }
