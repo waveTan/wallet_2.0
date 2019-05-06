@@ -9,7 +9,7 @@
 
     <div class="card_long mt_20 w1200 bg-white">
       <h5 class="card-title font18">节点信息 <i class="iconfont"
-                                            :class="nodeInfo.type === 0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
+                                            :class="nodeInfo.status === 0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
       </h5>
       <ul>
         <li>创建地址 <label>{{nodeInfo.agentAddress}}</label></li>
@@ -59,7 +59,7 @@
       </div>
       <div class="entrust_list w1200 bg-white" v-show="!jionNode">
         <div class="top_total font12">
-          总委托量：255633 <span class="fCN">NULS</span>
+          总委托量：{{nodeInfo.totalDeposit}} <span class="fCN">NULS</span>
         </div>
 
         <div class="top_ico">
@@ -107,7 +107,9 @@
       let checkAmount = (rule, value, callback) => {
         if (!value) {
           return callback(new Error('委托金额不能为空'));
-        } else {
+        }else if(value < 2000 || value > 500000){
+          return callback(new Error('委托金额必须大于2000并且小于500000'));
+        }else {
           callback()
         }
       };
@@ -130,7 +132,7 @@
         },
         jionNodeRules: {
           amount: [
-            {validator: checkAmount, trigger: 'blur'}
+            {validator: checkAmount, trigger: ['blur', 'change']}
           ]
         },
       };
@@ -158,7 +160,7 @@
       getNodeInfoByHash(hash) {
         this.$post('/', 'getConsensusNode', [hash])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               response.result.agentReward = timesDecimals(response.result.agentReward);
               response.result.deposits = timesDecimals(response.result.deposit);
@@ -388,7 +390,7 @@
         //console.log(txhex);
         await validateAndBroadcast(txhex).then((response) => {
           if (response.success) {
-            console.log(response.hash);
+            //console.log(response.hash);
             this.$router.push({
               name: "txList"
             })

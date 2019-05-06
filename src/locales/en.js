@@ -104,6 +104,13 @@ const en = {
     "1000": "Token"
   },
 
+  "frozenType": {
+    "undefined":"",
+    "1": "Highly locking",
+    "2": "Time locking",
+    "3": "Consensus locking"
+  },
+
   "addressType": {
     "undefined": "",
     "1": "General Account",

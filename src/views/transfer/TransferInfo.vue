@@ -16,7 +16,18 @@
         <li>高度 <label class="click"><u class="td">{{txInfo.height}}</u></label></li>
         <li>手续费 <label>{{txInfo.fee}}<span class="fCN">NULS</span></label></li>
         <li>类型 <label>{{$t('type.'+txInfo.type)}}</label></li>
-        <li>状态 <label>已确认</label></li>
+        <li>状态 <label>{{txInfo.status === 0 ? '已确认':'未确认'}}</label></li>
+        <li v-if="txInfo.type ===1">
+          节点ID
+          <label><u class="click td uppercase">{{txInfo.txData.agentId}}</u></label>
+        </li>
+        <li v-if="txInfo.type ===1">
+          轮次信息
+          <label>轮次
+            <u class=" click cd">{{txInfo.txData.roundIndex}}</u>
+            编号 {{txInfo.txData.packageIndex}}
+          </label>
+        </li>
         <li v-if="txInfo.type ===3">别名 <label>{{txInfo.txData.alias}}</label></li>
         <li v-if="txInfo.type ===4 || txInfo.type ===5 || txInfo.type ===9">
           创建地址
