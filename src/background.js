@@ -77,7 +77,8 @@ if (isDevelopment) {
     sendUpdateMessage(message.checking)
   });
   autoUpdater.on('update-available', function (info) {
-    console.log("检测到新版本，正在下载:"+info);
+    console.log("检测到新版本，正在下载:****");
+    console.log(info);
     sendUpdateMessage(message.updateAva)
   });
   autoUpdater.on('update-not-available', function (info) {
@@ -97,9 +98,9 @@ if (isDevelopment) {
     console.log(updateUrl);
     console.log(quitAndUpdate);
     ipcMain.on('isUpdateNow', (e, arg) => {
-      console.log(e);
-      console.log(arg);
-      console.log(arguments);
+       console.log(e);
+       console.log(arg);
+       console.log(arguments);
       console.log("开始更新");
       //some code here to handle event
       autoUpdater.quitAndInstall();

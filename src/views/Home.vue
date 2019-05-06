@@ -283,6 +283,9 @@
               newAssetsList.locking = 0;
               newAssetsList.balance = 0;
             }
+            this.addressInfo.balance = newAssetsList.balance;
+            localStorage.setItem(this.addressInfo.address,JSON.stringify(this.addressInfo));
+            sessionStorage.setItem(this.addressInfo.address,JSON.stringify(this.addressInfo));
             this.addressAssetsData.push(newAssetsList);
             this.assetsListLoading = false;
           })
@@ -301,6 +304,7 @@
       getTokenListByAddress(pageSize, pageRows, address) {
         this.$post('/', 'getAccountTokens', [pageSize, pageRows, address])
           .then((response) => {
+            //console.log(response);
             let newAssetsList = {};
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {

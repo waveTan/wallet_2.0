@@ -9,7 +9,7 @@
       <div class="right fr">
         <label class="clicks">服务协议</label>
         <label class="clicks">隐私政策</label>
-        <label>V1.6.1</label>
+        <label>Alpha 2.0.2</label>
       </div>
     </div>
   </div>

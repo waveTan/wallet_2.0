@@ -100,7 +100,7 @@
           callback(new Error('请输入金额'))
         } else if (!patrn.exec(value)) {
           callback(new Error('金额必须为数字'))
-        } else if (parseFloat(value) < 0.01) {
+        } else if (parseFloat(value) < 0.001) {
           callback(new Error('金额必须大于0.001'))
         } else {
           setTimeout(() => {

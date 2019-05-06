@@ -158,7 +158,16 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.newAddressInfo = nuls.newAddress(2, this.passwordForm.pass);
-            this.isFirst = false
+            let addressInfo = {
+              address: this.newAddressInfo.address,
+              aesPri: this.newAddressInfo.aesPri,
+              pub: this.newAddressInfo.pub,
+              alias: '',
+              remark: '',
+              selection: false,
+            };
+            localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
+            this.isFirst = false;
           } else {
             return false;
           }
@@ -176,7 +185,6 @@
        * 备份私钥
        **/
       backKey() {
-        //this.keyDialog = true;
         this.$refs.password.showPassword(true)
       },
 
@@ -199,15 +207,6 @@
        * 进入钱包
        */
       goWallet() {
-        let addressInfo = {
-          address: this.newAddressInfo.address,
-          aesPri: this.newAddressInfo.aesPri,
-          pub: this.newAddressInfo.pub,
-          alias: '',
-          remark: '',
-          selection: false,
-        };
-        localStorage.setItem(this.newAddressInfo.address, JSON.stringify(addressInfo));
         this.toUrl('address')
       },
 

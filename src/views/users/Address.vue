@@ -107,16 +107,16 @@
           }
         }
         //如果没有账户跳转到创建地址界面
-        if( this.addressList.length !== 0){
+        if (this.addressList.length !== 0) {
           //循环账户智能有一个是选中的账户
           let countSelection = 0;
-          for (let itmes of this.addressList) {
-            if (itmes.selection) {
+          for (let item  of this.addressList) {
+            if (item.selection) {
               countSelection++;
-              sessionStorage.setItem(itmes.address, JSON.stringify(itmes));
+              sessionStorage.setItem(item.address, JSON.stringify(item));
               if (countSelection > 1) {
-                itmes.selection = false;
-                localStorage.setItem(itmes.address, JSON.stringify(itmes))
+                item.selection = false;
+                localStorage.setItem(item.address, JSON.stringify(item))
               }
             }
           }
@@ -125,7 +125,7 @@
             this.addressList[0].selection = true;
             localStorage.setItem(this.addressList[0].address, JSON.stringify(this.addressList[0]))
           }
-        }else {
+        } else {
           this.$router.push({
             name: "newAddress",
             query: {'address': ''}
@@ -217,7 +217,7 @@
         const newAddressInfo = nuls.importByKey(2, pri, password);
         if (newAddressInfo.address === this.selectAddressInfo.address) {
           localStorage.removeItem(this.selectAddressInfo.address);
-          if(sessionStorage.hasOwnProperty(this.selectAddressInfo.address)){
+          if (sessionStorage.hasOwnProperty(this.selectAddressInfo.address)) {
             sessionStorage.removeItem(this.selectAddressInfo.address);
           }
           this.getAddressList();

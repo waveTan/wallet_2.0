@@ -18,7 +18,7 @@
       <div class="card-info right fr">
         <h5 class="card-title font18">
           所有共识
-          <span class="font16 click fr" @click="toUrl('newConsensus')" >创建</span>
+          <span class="font16 click fr" @click="toUrl('newConsensus')" v-show="!isNew">创建</span>
         </h5>
         <ul>
           <li>共识节点 <label>{{nodeCount.agentCount}}</label></li>
@@ -44,9 +44,9 @@
         <div class="node">
           <div class="node_info" v-for="item in allNodeData" :key="item.agentId">
             <h4 class="bg-gray">
-              <i class="iconfont iconwo"></i>&nbsp;
+              <i class="iconfont iconwo" v-show="item.isNew"></i>&nbsp;
               <span class="uppercase">{{item.agentId}}</span>&nbsp;
-              <i class="iconfont" :class="item.type ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
+              <i class="iconfont" :class="item.status ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
               <i class="follow el-icon-star-off"></i>
             </h4>
             <ul class="bg-white click" @click="toUrl('consensusInfo',item.txHash)">
@@ -65,9 +65,9 @@
         <div class="node">
           <div class="node_info" v-for="item in myNodeData" :key="item.agentId">
             <h4 class="bg-gray">
-              <i class="iconfont iconwo"></i>&nbsp;
+              <i class="iconfont iconwo" v-show="item.isNew"></i>&nbsp;
               <span class="uppercase">{{item.agentId}}</span>&nbsp;
-              <i class="iconfont" :class="item.type ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
+              <i class="iconfont" :class="item.status ===0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
               <i class="follow el-icon-star-off"></i>
             </h4>
             <ul class="bg-white click" @click="toUrl('consensusInfo',item.txHash)">
@@ -94,7 +94,7 @@
     name: 'consensus',
     data() {
       return {
-        consensusActive: 'consensusSecond',
+        consensusActive: 'consensusFirst',
         //节点信息
         nodeCount: {agentCount: 0, totalCount: 0},
         //nuls 信息
@@ -122,6 +122,7 @@
         search: '',
         allNodeData: [],//所有节点信息
         addressInfo: [], //账户信息
+        isNew: false,//账户是否已经创建了节点
         pageIndex: 1, //页码
         pageSize: 20, //每页条数
         pageTotal: 0,//总页数
@@ -137,34 +138,26 @@
       setInterval(() => {
         this.addressInfo = JSON.parse(sessionStorage.getItem(sessionStorage.key(0)));
       }, 500);
-
       this.getConsensusNodeCount();
       this.getCoinInfo();
+
     },
     mounted() {
       this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
       this.getConsensusInfoByAddress(this.pageIndex, this.pageSize, this.addressInfo.address);
     },
+    watch: {
+      addressInfo(val, old) {
+        if (val.address !== old.address && old.address) {
+          this.isNew = false;
+          this.getConsensusNodeCount();
+          this.getCoinInfo();
+          this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
+          this.getConsensusInfoByAddress(this.pageIndex, this.pageSize, this.addressInfo.address);
+        }
+      }
+    },
     methods: {
-
-      /**
-       * 根据地址获取共识信息
-       * @param pageIndex
-       * @param pageSize
-       * @param address
-       **/
-      getConsensusInfoByAddress(pageIndex, pageSize, address) {
-        this.$post('/', 'getAccountConsensus', [pageIndex, pageSize, address])
-          .then((response) => {
-            console.log(response);
-            if (response.hasOwnProperty("result")) {
-              this.myNodeData = response.result.list
-            }
-          })
-          .catch((error) => {
-            console.log("getAccountConsensus:" + error);
-          });
-      },
 
       /**
        * 获取共识数统计信息
@@ -213,7 +206,7 @@
       },
 
       /**
-       * 获取共识列表信息
+       * 所有共识列表信息
        * @param pageIndex
        * @param pageSize,
        * @param type
@@ -221,13 +214,18 @@
       getConsensusNodes(pageIndex, pageSize, type) {
         this.$post('/', 'getConsensusNodes', [pageIndex, pageSize, type])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.deposit = timesDecimals(itme.deposit);
                 itme.agentReward = timesDecimals(itme.agentReward);
                 itme.totalDeposit = timesDecimals(itme.totalDeposit);
                 itme.totalReward = timesDecimals(itme.totalReward);
+                if (itme.agentAddress === this.addressInfo.address) {
+                  itme.isNew = true;//创建的节点
+                } else {
+                  itme.isNew = false;
+                }
               }
               this.allNodeData = response.result.list
             }
@@ -236,6 +234,35 @@
             console.log("getConsensusNodes:" + error);
           });
 
+      },
+
+      /**
+       * 我的节点（根据地址获取共识信息）
+       * @param pageIndex
+       * @param pageSize
+       * @param address
+       **/
+      getConsensusInfoByAddress(pageIndex, pageSize, address) {
+        this.$post('/', 'getAccountConsensus', [pageIndex, pageSize, address])
+          .then((response) => {
+            //console.log(response);
+            if (response.hasOwnProperty("result")) {
+              this.myNodeData = response.result.list;
+              //循环获取节点列表判断是否有地址创建列表
+              for (let item of response.result.list) {
+                if (item.agentAddress === this.addressInfo.address) {
+                  item.isNew = true;//创建的节点
+                  this.isNew = true;
+                } else {
+                  item.isNew = false;
+                  this.isNew = false;
+                }
+              }
+            }
+          })
+          .catch((error) => {
+            console.log("getAccountConsensus:" + error);
+          });
       },
 
       /**
@@ -304,6 +331,7 @@
        * @param tab
        */
       handleClick(tab) {
+        this.consensusActive = tab.name;
         if (tab.name === 'consensusFirst') {
           this.getConsensusNodes(this.pageIndex, this.pageSize, this.type);
         } else {

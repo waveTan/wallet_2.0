@@ -52,7 +52,8 @@
 <script>
   import * as config from '../config.js'
   import logo from './../assets/img/logo.svg'
-  import testnetLogo from './../assets/img/logo-test-black.svg'
+  //import testnetLogo from './../assets/img/logo-test-black.svg'
+  import testnetLogo from './../assets/img/alpha-black.svg'
   import {superLong} from '@/api/util'
 
   export default {

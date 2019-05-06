@@ -15,11 +15,12 @@
         <li>创建地址 <label>{{nodeInfo.agentAddress}}</label></li>
         <li>保证金 <label>{{nodeInfo.deposits}}<span class="fCN">NULS</span></label></li>
         <li>奖励地址 <label>{{nodeInfo.rewardAddress}}</label></li>
-        <li>创建时间 <label>{{nodeInfo.createTime}}</label></li>
+        <li>总委托 <label>{{nodeInfo.totalDeposit}}<span class="fCN">NULS</span></label></li>
         <li>打包地址 <label>{{nodeInfo.packingAddress}}</label></li>
-        <li>参与人数 <label>{{nodeInfo.depositCount}}</label></li>
+        <li>总奖励 <label>{{nodeInfo.totalReward}}<span class="fCN">NULS</span></label></li>
         <li>创建者别名 <label>{{nodeInfo.agentAlias ? nodeInfo.agentAlias :'--' }}</label></li>
-        <li>总奖励 <label><u class="click td">{{nodeInfo.totalReward}}</u><span class="fCN">NULS</span></label></li>
+        <li>参与人数 <label>{{nodeInfo.depositCount}}</label></li>
+        <li>创建时间 <label>{{nodeInfo.createTime}}</label></li>
         <li>佣金比例
           <label>{{nodeInfo.commissionRate}}%
             <el-tooltip placement="top">
@@ -30,7 +31,6 @@
         </li>
         <li>节点惩罚 <label><u class="click td">{{nodeInfo.yellowCardCount}}黄牌</u></label></li>
         <li>信用值 <label>{{nodeInfo.creditValue}}</label></li>
-        <li></li>
         <p class="cb"></p>
       </ul>
       <div class="logout bg-white" v-show="addressInfo.address === nodeInfo.agentAddress">
@@ -158,7 +158,7 @@
       getNodeInfoByHash(hash) {
         this.$post('/', 'getConsensusNode', [hash])
           .then((response) => {
-            //console.log(response);
+            console.log(response);
             if (response.hasOwnProperty("result")) {
               response.result.agentReward = timesDecimals(response.result.agentReward);
               response.result.deposits = timesDecimals(response.result.deposit);
