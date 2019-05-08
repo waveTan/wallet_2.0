@@ -59,7 +59,7 @@
     >
 
       <div class="address-remark bg-white">
-        <el-input v-model="remarkInfo" placeholder="请输入备注"></el-input>
+        <el-input v-model.trim="remarkInfo" placeholder="请输入备注"></el-input>
         <div class="btn-next">
           <el-button @click="remarkDialog=false">取 消</el-button>
           <el-button type="success" @click='addRemark'>确 定</el-button>

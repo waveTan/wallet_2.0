@@ -1,77 +1,77 @@
 <template>
-  <div class="node_service bg-gray" v-loading="loading"
-       element-loading-text="节点切换中....">
-    <h3 class="title">节点服务列表</h3>
+    <div class="node_service bg-gray" v-loading="loading"
+         element-loading-text="节点切换中....">
+        <h3 class="title">节点服务列表</h3>
 
-    <div class="w1200 mt_20" v-loading="nodeServiceLoading">
-      <div class="top_ico">
-        <i class="el-icon-plus click" @click="nodeServiceDialog = true"></i>
-      </div>
-      <el-table :data="nodeServiceData" stripe border>
-        <el-table-column prop="name" label="名称" align="center">
-        </el-table-column>
-        <el-table-column prop="urls" label="地址" align="center">
-        </el-table-column>
-        <el-table-column prop="delay" label="延迟" align="center">
-        </el-table-column>
-        <el-table-column prop="state" label="状态" align="center">
-          <template slot-scope="scope">
+        <div class="w1200 mt_20" v-loading="nodeServiceLoading">
+            <div class="top_ico">
+                <i class="el-icon-plus click" @click="addNodeService"></i>
+            </div>
+            <el-table :data="nodeServiceData" stripe border>
+                <el-table-column prop="name" label="名称" align="center">
+                </el-table-column>
+                <el-table-column prop="urls" label="地址" align="center">
+                </el-table-column>
+                <el-table-column prop="delay" label="延迟" align="center">
+                </el-table-column>
+                <el-table-column prop="state" label="状态" align="center">
+                    <template slot-scope="scope">
             <span @click="editState(scope.$index)">
               <i class="iconfont click" :class="scope.row.state === 0 ? 'iconduankailianjie' : 'el-icon-check'"></i>
             </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <div v-if="scope.row.isDelete">
-              <label class="click tab_bn" @click="edit(scope.$index)">修改</label>
-              <span class="tab_line">|</span>
-              <label class="click tab_bn" @click="removeUrl(scope.$index)">移除</label>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.isDelete">
+                            <label class="click tab_bn" @click="edit(scope.$index)">修改</label>
+                            <span class="tab_line">|</span>
+                            <label class="click tab_bn" @click="removeUrl(scope.$index)">移除</label>
+                        </div>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <el-dialog title="添加节点服务地址" width="40%"
+                   :visible.sync="nodeServiceDialog"
+                   :close-on-click-modal="false"
+                   :close-on-press-escape="false"
+                   v-loading="nodeServiceDialogLoading"
+        >
+            <span>您输入的非官方地址可能无法正常使用，因此造成的损失将由您自己承担</span>
+
+            <div class="bg-white">
+                <el-form :model="nodeServiceForm" status-icon :rules="nodeServiceRules" ref="nodeServiceForm">
+                    <el-form-item label="名称" prop="name">
+                        <el-input v-model.number="nodeServiceForm.name" maxlength="20">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="服务地址" prop="urls">
+                        <el-input type="text" v-model="nodeServiceForm.urls" autocomplete="off" maxlength="50">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item class="btns tl">
+                        <el-button type="success" class="fl" @click="testSubmitForm('nodeServiceForm')">测试连接</el-button>
+                        <div class="fl ml_50" v-show="testInfo">
+                            <i :class="testInfo === '0' ? 'el-icon-circle-check fCN' : 'el-icon-circle-close fred' "></i>&nbsp;
+                            <span v-show="testInfo !== '0'" class="fred font12">{{testInfo}}</span>
+                        </div>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-radio-group v-model="nodeServiceForm.resource">
+                            <el-radio label="立即使用"></el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item class="btns tc">
+                        <el-button @click="resetForm('nodeServiceForm')">取 消</el-button>
+                        <el-button type="success" @click="submitForm('nodeServiceForm')">确 定</el-button>
+                    </el-form-item>
+                    <div class="cb"></div>
+                </el-form>
             </div>
-          </template>
-        </el-table-column>
-      </el-table>
+        </el-dialog>
     </div>
-
-    <el-dialog title="添加节点服务地址" width="40%"
-               :visible.sync="nodeServiceDialog"
-               :close-on-click-modal="false"
-               :close-on-press-escape="false"
-               v-loading="nodeServiceDialogLoading"
-    >
-      <span>您输入的非官方地址可能无法正常使用，因此造成的损失将由您自己承担</span>
-
-      <div class="bg-white">
-        <el-form :model="nodeServiceForm" status-icon :rules="nodeServiceRules" ref="nodeServiceForm">
-          <el-form-item label="名称" prop="name">
-            <el-input v-model.number="nodeServiceForm.name">
-            </el-input>
-          </el-form-item>
-          <el-form-item label="服务地址" prop="urls">
-            <el-input type="text" v-model="nodeServiceForm.urls" autocomplete="off">
-            </el-input>
-          </el-form-item>
-          <el-form-item class="btns tl">
-            <el-button type="success" class="fl" @click="testSubmitForm('nodeServiceForm')">测试连接</el-button>
-            <div class="fl ml_50" v-show="testInfo">
-              <i :class="testInfo === '0' ? 'el-icon-circle-check fCN' : 'el-icon-circle-close fred' "></i>&nbsp;
-              <span v-show="testInfo !== '0'" class="fred font12">{{testInfo}}</span>
-            </div>
-          </el-form-item>
-          <el-form-item>
-            <el-radio-group v-model="nodeServiceForm.resource">
-              <el-radio label="立即使用"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item class="btns tc">
-            <el-button @click="resetForm('nodeServiceForm')">取 消</el-button>
-            <el-button type="success" @click="submitForm('nodeServiceForm')">确 定</el-button>
-          </el-form-item>
-          <div class="cb"></div>
-        </el-form>
-      </div>
-    </el-dialog>
-  </div>
 </template>
 
 <script>
@@ -132,7 +132,6 @@
       setInterval(() => {
         this.nodeServiceData = localStorage.hasOwnProperty('urlsData') ? JSON.parse(localStorage.getItem('urlsData')) : this.defaultData;
       }, 500);
-
     },
     mounted() {
       this.getDelay();
@@ -229,6 +228,13 @@
       },
 
       /**
+       * 添加节点
+       **/
+      addNodeService() {
+        this.nodeServiceDialog = true
+      },
+
+      /**
        * 添加节点提交
        * @param formName
        */
@@ -291,8 +297,16 @@
        * @param index
        **/
       removeUrl(index) {
-        this.nodeServiceData.splice(index, 1);
-        localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+        this.$confirm('此操作将移除' + this.nodeServiceData[index].urls + '节点服务是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({type: 'success', message: '移除成功!'});
+          this.nodeServiceData.splice(index, 1);
+          localStorage.setItem("urlsData", JSON.stringify(this.nodeServiceData));
+        }).catch(() => {
+        });
       },
 
       /**
@@ -310,32 +324,32 @@
 </script>
 
 <style lang="less">
-  @import "./../../assets/css/style";
+    @import "./../../assets/css/style";
 
-  .node_service {
-    .el-dialog__wrapper {
-      .el-dialog__body {
-        padding-bottom: 50px;
-        .bg-white {
-          margin: 20px auto 0;
-          padding: 20px;
-          .btns {
-            .el-form-item__content {
-              .el-button {
-                width: 130px;
-                span {
-                  color: @Bcolour;
+    .node_service {
+        .el-dialog__wrapper {
+            .el-dialog__body {
+                padding-bottom: 50px;
+                .bg-white {
+                    margin: 20px auto 0;
+                    padding: 20px;
+                    .btns {
+                        .el-form-item__content {
+                            .el-button {
+                                width: 130px;
+                                span {
+                                    color: @Bcolour;
+                                }
+                            }
+                            .el-button--default {
+                                span {
+                                    color: @Fcolour;
+                                }
+                            }
+                        }
+                    }
                 }
-              }
-              .el-button--default {
-                span {
-                  color: @Fcolour;
-                }
-              }
             }
-          }
         }
-      }
     }
-  }
 </style>

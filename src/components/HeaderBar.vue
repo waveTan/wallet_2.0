@@ -1,51 +1,53 @@
 <template>
-  <div class="header">
-    <div class="w1200">
-      <div class="logo">
-        <img class="click" :src=logoSvg>
-      </div>
-      <div class="nav">
-        <el-menu mode="horizontal" :default-active="navActives($route.path)" @select="handleSelect">
-          <el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>
-          <el-menu-item index="transfer" :disabled="addressList.length === 0">{{$t('nav.transfer')}}</el-menu-item>
-          <el-menu-item index="consensus" :disabled="addressList.length === 0">{{$t('nav.consensus')}}</el-menu-item>
-          <el-menu-item index="contract" disabled>{{$t('nav.contracts')}}</el-menu-item>
-          <!--<el-submenu index="5" disabled>
-            <template slot="title">{{$t('nav.application')}}</template>
-            <el-menu-item index="2-1">应用1</el-menu-item>
-            <el-menu-item index="2-2">应用2</el-menu-item>
-            <el-menu-item index="2-3">应用3</el-menu-item>
-          </el-submenu>-->
-        </el-menu>
-      </div>
-      <div class="tool">
-        <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect" >
-          <el-submenu index="address" class="user" :disabled="addressList.length === 0">
-            <template slot="title"><i class="iconfont iconzhanghu"></i></template>
-            <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address">
-              <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
-              {{item.addresss}}<span v-show="item.alias"> | ({{item.alias}})</span> | <span>{{item.balance}}</span>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="set">
-            <template slot="title">设置</template>
-            <el-menu-item index="address" class="tc">地址管理</el-menu-item>
-            <el-menu-item index="nodeService" class="tc">服务节点</el-menu-item>
-            <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
-          </el-submenu>
-          <el-submenu index="lang">
-            <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>
-            <el-menu-item index="cn">中文</el-menu-item>
-            <el-menu-item index="en">English</el-menu-item>
-          </el-submenu>
-          <li class="el-menu-item">|</li>
-          <el-menu-item index="24" disabled>帮助</el-menu-item>
-        </el-menu>
+    <div class="header">
+        <div class="w1200">
+            <div class="logo">
+                <img class="click" @click="toUrl('home')" :src=logoSvg>
+            </div>
+            <div class="nav">
+                <el-menu mode="horizontal" :default-active="navActives($route.path)" @select="handleSelect">
+                    <el-menu-item index="home">{{$t('nav.wallet')}}</el-menu-item>
+                    <el-menu-item index="transfer" :disabled="addressList.length === 0">{{$t('nav.transfer')}}
+                    </el-menu-item>
+                    <el-menu-item index="consensus" :disabled="addressList.length === 0">{{$t('nav.consensus')}}
+                    </el-menu-item>
+                    <el-menu-item index="contract" disabled>{{$t('nav.contracts')}}</el-menu-item>
+                    <!--<el-submenu index="5" disabled>
+                      <template slot="title">{{$t('nav.application')}}</template>
+                      <el-menu-item index="2-1">应用1</el-menu-item>
+                      <el-menu-item index="2-2">应用2</el-menu-item>
+                      <el-menu-item index="2-3">应用3</el-menu-item>
+                    </el-submenu>-->
+                </el-menu>
+            </div>
+            <div class="tool">
+                <el-menu mode="horizontal" :default-active="navActive" @select="handleSelect">
+                    <el-submenu index="address" class="user" :disabled="addressList.length === 0" >
+                        <template slot="title"><i class="iconfont iconzhanghu"></i></template>
+                        <el-menu-item v-for="item in addressList" :key="item.address" :index="item.address" >
+                            <i class="iconfont iconwo" :class="item.selection ? '' : 'transparent' "></i>
+                            {{item.addresss}}<span v-show="item.alias"> | ({{item.alias}})</span> | <span>{{item.balance}}</span>
+                        </el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="set">
+                        <template slot="title">设置</template>
+                        <el-menu-item index="address" class="tc">地址管理</el-menu-item>
+                        <el-menu-item index="nodeService" class="tc">服务节点</el-menu-item>
+                        <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
+                    </el-submenu>
+                    <el-submenu index="lang">
+                        <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>
+                        <el-menu-item index="cn">中文</el-menu-item>
+                        <el-menu-item index="en">English</el-menu-item>
+                    </el-submenu>
+                    <li class="el-menu-item">|</li>
+                    <el-menu-item index="24" disabled>帮助</el-menu-item>
+                </el-menu>
 
-      </div>
+            </div>
+        </div>
+        <div class="cb"></div>
     </div>
-    <div class="cb"></div>
-  </div>
 
 </template>
 
@@ -151,42 +153,54 @@
         this.lang = e;
         this.$i18n.locale = this.lang;
       },
+
+      /**
+       * 连接跳转
+       * @param name
+       * @param params
+       */
+      toUrl(name) {
+        //console.log(name,params);
+        this.$router.push({
+          name: name
+        })
+      },
     },
     watch: {}
   }
 </script>
 
 <style lang="less">
-  @import "./../assets/css/style";
+    @import "./../assets/css/style";
 
-  .header {
-    border-bottom: 1px solid @Dcolour;
-    height: 80px;
-    .logo {
-      width: 120px;
-      float: left;
-      img {
-        margin: 20px 0 0 0;
-        width: 100%;
-      }
-    }
-    .nav {
-      width: 600px;
-      margin: 10px 0 0 0;
-      float: left;
-    }
-    .tool {
-      width: 340px;
-      margin: 10px 0 0 0;
-      float: right;
-      background-color: #e6a23c;
-      .user {
-        .el-submenu__title {
-          .el-icon-arrow-down {
-            margin: 35px 0 0 -16px
-          }
+    .header {
+        border-bottom: 1px solid @Dcolour;
+        height: 80px;
+        .logo {
+            width: 120px;
+            float: left;
+            img {
+                margin: 20px 0 0 0;
+                width: 100%;
+            }
         }
-      }
+        .nav {
+            width: 600px;
+            margin: 10px 0 0 0;
+            float: left;
+        }
+        .tool {
+            width: 340px;
+            margin: 10px 0 0 0;
+            float: right;
+            background-color: #e6a23c;
+            .user {
+                .el-submenu__title {
+                    .el-icon-arrow-down {
+                        margin: 35px 0 0 -16px
+                    }
+                }
+            }
+        }
     }
-  }
 </style>

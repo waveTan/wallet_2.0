@@ -1,97 +1,101 @@
 <template>
-  <div class="consensus_info bg-gray">
-    <div class="bg-white">
-      <div class="w1200">
-        <BackBar backTitle="共识"></BackBar>
-        <h3 class="title uppercase">{{nodeInfo.agentId}}<i class="el-icon-star-off click"></i></h3>
-      </div>
-    </div>
-
-    <div class="card_long mt_20 w1200 bg-white">
-      <h5 class="card-title font18">节点信息 <i class="iconfont"
-                                            :class="nodeInfo.status === 0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
-      </h5>
-      <ul>
-        <li>创建地址 <label>{{nodeInfo.agentAddress}}</label></li>
-        <li>保证金 <label>{{nodeInfo.deposits}}<span class="fCN">NULS</span></label></li>
-        <li>奖励地址 <label>{{nodeInfo.rewardAddress}}</label></li>
-        <li>总委托 <label>{{nodeInfo.totalDeposit}}<span class="fCN">NULS</span></label></li>
-        <li>打包地址 <label>{{nodeInfo.packingAddress}}</label></li>
-        <li>总奖励 <label>{{nodeInfo.totalReward}}<span class="fCN">NULS</span></label></li>
-        <li>创建者别名 <label>{{nodeInfo.agentAlias ? nodeInfo.agentAlias :'--' }}</label></li>
-        <li>参与人数 <label>{{nodeInfo.depositCount}}</label></li>
-        <li>创建时间 <label>{{nodeInfo.createTime}}</label></li>
-        <li>佣金比例
-          <label>{{nodeInfo.commissionRate}}%
-            <el-tooltip placement="top">
-              <div slot="content">该手续费值是根据当前NULS网络预估的，实际消耗可能小于该值，多余部分将会通过共识奖励退回</div>
-              <i class="el-icon-warning"></i>
-            </el-tooltip>
-          </label>
-        </li>
-        <li>节点惩罚 <label><u class="click td">{{nodeInfo.yellowCardCount}}黄牌</u></label></li>
-        <li>信用值 <label>{{nodeInfo.creditValue}}</label></li>
-        <p class="cb"></p>
-      </ul>
-      <div class="logout bg-white" v-show="addressInfo.address === nodeInfo.agentAddress">
-        <el-button type="danger" @click="stopNode">注销节点</el-button>
-      </div>
-    </div>
-    <div class="cb"></div>
-
-    <div v-loading="nodeDepositLoading">
-      <div class="entrust w1200 bg-white" v-show="jionNode">
-        <div class="entrust_add w630">
-          <el-form :model="jionNodeForm" status-icon :rules="jionNodeRules" ref="jionNodeForm">
-            <el-form-item label="委托金额(NULS):" prop="amount">
-              <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
-              <el-input v-model.number="jionNodeForm.amount">
-              </el-input>
-            </el-form-item>
-            <div class="font14">
-              手续费：{{fee}} <span class="fCN">NULS</span>
+    <div class="consensus_info bg-gray">
+        <div class="bg-white">
+            <div class="w1200">
+                <BackBar backTitle="共识"></BackBar>
+                <h3 class="title uppercase">{{nodeInfo.agentId}}<i class="el-icon-star-off click"></i></h3>
             </div>
-            <el-form-item class="form-next">
-              <el-button type="success" @click="jionNodeSubmitForm('jionNodeForm')">确 定</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-      </div>
-      <div class="entrust_list w1200 bg-white" v-show="!jionNode">
-        <div class="top_total font12">
-          总委托量：{{nodeInfo.totalDeposit}} <span class="fCN">NULS</span>
         </div>
 
-        <div class="top_ico">
-          <i class="el-icon-plus click" @click="showNodeList"></i>
+        <div class="card_long mt_20 w1200 bg-white">
+            <h5 class="card-title font18">
+                节点信息
+                <i class="iconfont" :class="nodeInfo.status === 0 ? 'icondaigongshi fred' : 'icongongshizhong fCN'"></i>
+                <el-button class="fr fred" type="danger" @click="stopNode"
+                           v-show="addressInfo.address === nodeInfo.agentAddress">注销节点
+                </el-button>
+            </h5>
+            <ul>
+                <li>创建地址 <label>{{nodeInfo.agentAddress}}</label></li>
+                <li>保证金 <label>{{nodeInfo.deposits}}<span class="fCN">NULS</span></label></li>
+                <li>奖励地址 <label>{{nodeInfo.rewardAddress}}</label></li>
+                <li>总委托 <label>{{nodeInfo.totalDeposit}}<span class="fCN">NULS</span></label></li>
+                <li>打包地址 <label>{{nodeInfo.packingAddress}}</label></li>
+                <li>总奖励 <label>{{nodeInfo.totalReward}}<span class="fCN">NULS</span></label></li>
+                <li>创建者别名 <label>{{nodeInfo.agentAlias ? nodeInfo.agentAlias :'--' }}</label></li>
+                <li>参与人数 <label>{{nodeInfo.depositCount}}</label></li>
+                <li>创建时间 <label>{{nodeInfo.createTime}}</label></li>
+                <li>佣金比例
+                    <label>{{nodeInfo.commissionRate}}%
+                        <!--<el-tooltip placement="top">
+                          <div slot="content">该手续费值是根据当前NULS网络预估的，实际消耗可能小于该值，多余部分将会通过共识奖励退回</div>
+                          <i class="el-icon-warning"></i>
+                        </el-tooltip>-->
+                    </label>
+                </li>
+                <li>节点惩罚 <label><u class="click td">{{nodeInfo.yellowCardCount}}黄牌</u></label></li>
+                <li>信用值 <label>{{nodeInfo.creditValue}}</label></li>
+                <p class="cb"></p>
+            </ul>
         </div>
-        <el-table :data="nodeDepositData" stripe border>
-          <el-table-column prop="blockHeight" label="高度" align="center">
-          </el-table-column>
-          <el-table-column prop="createTime" label="加入时间" align="center">
-          </el-table-column>
-          <el-table-column prop="amount" label="金额(NULS)" align="center">
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-              <label class="click tab_bn" @click="cancelDeposit(scope.row)">退出</label>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div class="pages">
-          <div class="page-total">显示1-20 共 {{pageTotal}}</div>
-          <el-pagination class="fr" background v-show="pageTotal>pageSize" @current-change="nodeDepositPages"
-                         :page-size="pageSize"
-                         layout=" prev, pager, next, jumper"
-                         :total="pageTotal">
-          </el-pagination>
+        <div class="cb"></div>
+
+        <div v-loading="nodeDepositLoading">
+            <div class="entrust w1200 bg-white" v-show="jionNode">
+                <div class="entrust_add w630">
+                    <el-form :model="jionNodeForm" status-icon :rules="jionNodeRules" ref="jionNodeForm">
+                        <el-form-item label="委托金额(NULS):" prop="amount">
+                            <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
+                            <el-input v-model.number="jionNodeForm.amount">
+                            </el-input>
+                        </el-form-item>
+                        <div class="font14">
+                            手续费：{{fee}} <span class="fCN">NULS</span>
+                        </div>
+                        <el-form-item class="form-next">
+                            <el-button type="success" @click="jionNodeSubmitForm('jionNodeForm')">确 定</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+            <div class="entrust_list w1200 bg-white" v-show="!jionNode">
+                <div class="top_total font12">
+                    总委托量：{{nodeInfo.totalDeposit}} <span class="fCN">NULS</span>
+                </div>
+
+                <div class="top_ico">
+                    <i class="el-icon-plus click" @click="showNodeList"></i>
+                </div>
+                <el-table :data="nodeDepositData" stripe border>
+                    <el-table-column prop="blockHeight" label="高度" align="center">
+                    </el-table-column>
+                    <el-table-column prop="createTime" label="加入时间" align="center">
+                    </el-table-column>
+                    <el-table-column prop="amount" label="金额(NULS)" align="center">
+                    </el-table-column>
+                    <el-table-column label="操作" align="center">
+                        <template slot-scope="scope">
+                            <label class="click tab_bn" @click="cancelDeposit(scope.row)">退出</label>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="pages">
+                    <div class="page-total">
+                        显示 {{pageIndex-1 === 0 ? 1 : (pageIndex-1) *pageSize}}-{{pageIndex*pageSize}}
+                        共 {{pageTotal}}
+                    </div>
+                    <el-pagination class="fr" background v-show="pageTotal>pageSize" @current-change="nodeDepositPages"
+                                   :page-size="pageSize"
+                                   layout=" prev, pager, next, jumper"
+                                   :total="pageTotal">
+                    </el-pagination>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <Password ref="password" @passwordSubmit="passSubmit">
+        </Password>
     </div>
-
-    <Password ref="password" @passwordSubmit="passSubmit">
-    </Password>
-  </div>
 </template>
 
 <script>
@@ -105,11 +109,12 @@
   export default {
     data() {
       let checkAmount = (rule, value, callback) => {
+        let usable = 500000 - Number(this.nodeInfo.totalDeposit);
         if (!value) {
           return callback(new Error('委托金额不能为空'));
-        }else if(value < 2000 || value > 500000){
-          return callback(new Error('委托金额必须大于2000并且小于500000'));
-        }else {
+        } else if (value < 2000 || value > usable) {
+          return callback(new Error('委托金额必须大于2000并且小于500000-总委托额'));
+        } else {
           callback()
         }
       };
@@ -215,7 +220,7 @@
        **/
       nodeDepositPages(val) {
         this.pageIndex = val;
-        this.getNodeDepositByHash(this.pageIndex, this.pageSize, this.$route.query.hash);
+        this.getNodeDepositByHash(this.pageIndex, this.pageSize ,this.addressInfo.address, this.$route.query.hash);
       },
 
       /**
@@ -416,31 +421,27 @@
 </script>
 
 <style lang="less">
-  @import "./../../assets/css/style";
+    @import "./../../assets/css/style";
 
-  .consensus_info {
-    .logout {
-      width: 1160px;
-      margin: 5px auto 0;
-      padding: 30px 0;
-      text-align: center;
-      border-top: @BD1;
-      .el-button--danger {
-        width: 400px;
-      }
-    }
-    .entrust {
-      border: @BD1;
-      margin: 20px auto 0;
-      .entrust_add {
-        margin: 30px auto 50px;
-        .balance {
-          margin: 10px 0 0 0;
+    .consensus_info {
+        .el-button--danger {
+            width: 100px;
+            padding: 10px 0 10px 20px;
+            text-align: center;
+            margin: 8px 20px 0 0;
         }
-      }
+        .entrust {
+            border: @BD1;
+            margin: 20px auto 0;
+            .entrust_add {
+                margin: 30px auto 50px;
+                .balance {
+                    margin: 10px 0 0 0;
+                }
+            }
+        }
+        .entrust_list {
+            margin: 50px auto 0;
+        }
     }
-    .entrust_list {
-      margin: 50px auto 0;
-    }
-  }
 </style>

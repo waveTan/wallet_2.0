@@ -279,44 +279,51 @@
        * @param password
        **/
       async passSubmit(password) {
-        let transferInfo = {
-          fromAddress: this.transferForm.fromAddress,
-          toAddress: this.transferForm.toAddress,
-          assetsChainId: 2,
-          assetsId: 1,
-          amount: Number(Times(this.transferForm.amount, 100000000).toString()),
-          fee: 10000
-        };
-        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
-        let tAssemble = [];//交易组装
-        let txhex = "";//交易签名
-        if (inOrOutputs.success) {
-          tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
-          //获取手续费
-          let newFee = countFee(tAssemble, 1);
-          //手续费大于0.001的时候重新组装交易及签名
-          if (transferInfo.fee !== newFee) {
-            transferInfo.fee = newFee;
-            inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+
+        const pri = nuls.decrypteOfAES(this.addressInfo.aesPri, password);
+        const newAddressInfo = nuls.importByKey(2, pri, password);
+        if (newAddressInfo.address === this.addressInfo.address) {
+          let transferInfo = {
+            fromAddress: this.transferForm.fromAddress,
+            toAddress: this.transferForm.toAddress,
+            assetsChainId: 2,
+            assetsId: 1,
+            amount: Number(Times(this.transferForm.amount, 100000000).toString()),
+            fee: 10000
+          };
+          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+          let tAssemble = [];//交易组装
+          let txhex = "";//交易签名
+          if (inOrOutputs.success) {
             tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
-            txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+            //获取手续费
+            let newFee = countFee(tAssemble, 1);
+            //手续费大于0.001的时候重新组装交易及签名
+            if (transferInfo.fee !== newFee) {
+              transferInfo.fee = newFee;
+              inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 2);
+              tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, this.transferForm.remarks, 2);
+              txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+            } else {
+              txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+            }
           } else {
-            txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+            this.$message({message: inOrOutputs.data, type: 'error', duration: 1000});
           }
-        } else {
-          this.$message({message: "input和outputs组装错误：" + inOrOutputs.data, type: 'error', duration: 1000});
+          //console.log(txhex);
+          //验证并广播交易
+          await validateAndBroadcast(txhex).then((response) => {
+            if (response.success) {
+              this.toUrl("txList");
+            } else {
+              this.$message({message: response.data, type: 'error', duration: 1000});
+            }
+          }).catch((err) => {
+            this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
+          });
+        }else {
+          this.$message({message: "对不起，密码错误", type: 'error', duration: 1000});
         }
-        //console.log(txhex);
-        //验证并广播交易
-        await validateAndBroadcast(txhex).then((response) => {
-          if (response.success) {
-            this.toUrl("txList");
-          } else {
-            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
-          }
-        }).catch((err) => {
-          this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
-        });
       },
 
       /**
@@ -326,7 +333,6 @@
       showBook(){
         this.$message({message: "开发者......" , duration: 1000});
       },
-
 
       /**
        * 连接跳转

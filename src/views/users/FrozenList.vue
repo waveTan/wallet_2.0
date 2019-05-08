@@ -1,46 +1,47 @@
 <template>
-  <div class="frozen_list bg-gray">
-    <div class="bg-white">
-      <div class="w1200">
-        <BackBar backTitle="钱包"></BackBar>
-        <h3 class="title">冻结列表</h3>
-      </div>
-    </div>
-
-    <div class="w1200 mt_20">
-      <el-table :data="txListData" stripe border>
-        <el-table-column label="类型" align="center">
-          <template slot-scope="scope"><span>{{ $t('frozenType.'+scope.row.type) }}</span></template>
-        </el-table-column>
-        <el-table-column label="txHash" align="center" min-width="150">
-          <template slot-scope="scope">
-            <span class="click" @click="toUrl('transferInfo',scope.row.txHash)">{{scope.row.txHashs}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="时间" align="center">
-        </el-table-column>
-        <el-table-column prop="values" label="金额" align="center">
-        </el-table-column>
-        <el-table-column prop="height" label="解冻高度/时间" align="center">
-        </el-table-column>
-        <el-table-column label="冻结原因" align="center">
-          <template slot-scope="scope"><span>{{scope.row.type === 3 ? $t('type.5'):  scope.row.reason}}</span></template>
-        </el-table-column>
-      </el-table>
-      <div class="pages">
-        <div class="page-total">
-          显示 {{pageIndex-1 === 0 ? 1 : (pageIndex-1) *pageSize}}-{{pageIndex*pageSize}}
-          共 {{pageTotal}}
+    <div class="frozen_list bg-gray">
+        <div class="bg-white">
+            <div class="w1200">
+                <BackBar backTitle="钱包"></BackBar>
+                <h3 class="title">冻结列表</h3>
+            </div>
         </div>
-        <el-pagination @current-change="frozenListPages" class="fr" background
-                       v-show="pageTotal>pageSize"
-                       :page-size=pageSize
-                       layout=" prev, pager, next, jumper"
-                       :total=pageTotal>
-        </el-pagination>
-      </div>
+
+        <div class="w1200 mt_20">
+            <el-table :data="txListData" stripe border>
+                <el-table-column label="类型" align="center">
+                    <template slot-scope="scope"><span>{{ $t('frozenType.'+scope.row.type) }}</span></template>
+                </el-table-column>
+                <el-table-column label="txHash" align="center" min-width="150">
+                    <template slot-scope="scope">
+                        <span class="click" @click="toUrl('transferInfo',scope.row.txHash)">{{scope.row.txHashs}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="createTime" label="时间" align="center">
+                </el-table-column>
+                <el-table-column prop="values" label="金额" align="center">
+                </el-table-column>
+                <el-table-column prop="lockedValue" label="解冻高度/时间" align="center">
+                </el-table-column>
+                <el-table-column label="冻结原因" align="center">
+                    <template slot-scope="scope"><span>{{scope.row.type === 3 ? $t('type.5'):  scope.row.reason}}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pages">
+                <div class="page-total">
+                    显示 {{pageIndex-1 === 0 ? 1 : (pageIndex-1) *pageSize}}-{{pageIndex*pageSize}}
+                    共 {{pageTotal}}
+                </div>
+                <el-pagination @current-change="frozenListPages" class="fr" background
+                               v-show="pageTotal>pageSize"
+                               :page-size=pageSize
+                               layout=" prev, pager, next, jumper"
+                               :total=pageTotal>
+                </el-pagination>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -80,20 +81,28 @@
       getTxListByAddress(pageIndex, pageSize, address) {
         this.$post('/', 'getAccountFreezes', [pageIndex, pageSize, address])
           .then((response) => {
-            console.log(response);
+            //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let item of response.result.list) {
                 item.createTime = moment(getLocalTime(item.createTime)).format('YYYY-MM-DD HH:mm:ss');
                 item.txHashs = superLong(item.txHash, 16);
                 item.balance = timesDecimals(item.amount);
                 item.values = timesDecimals(item.amount);
+                if (item.type === 2) {
+                  item.reason = "注销节点";
+                  item.lockedValue = moment(getLocalTime(item.lockedValue)).format('YYYY-MM-DD HH:mm:ss');
+                } else if (item.type === 3) {
+                  if (item.lockedValue === -1) {
+                    item.lockedValue = '--'
+                  }
+                }
               }
               this.pageTotal = response.result.totalCount;
               this.txListData = response.result.list;
             }
           })
           .catch((error) => {
-            console.log("getAccountTxs:"+error);
+            console.log("getAccountTxs:" + error);
           });
 
       },
@@ -112,7 +121,7 @@
        * @param name
        * @param param
        */
-      toUrl(name,param) {
+      toUrl(name, param) {
         //console.log(name)
         this.$router.push({
           name: name,

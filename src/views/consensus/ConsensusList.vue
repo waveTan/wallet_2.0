@@ -30,10 +30,9 @@
           共 {{pageTotal}}
         </div>
 
-        <el-pagination v-show="pageTotal > pageSize" @current-change="consensusPages" class="fr"
+        <el-pagination v-show="pageTotal > pageSize" @current-change="consensusPages" class="fr" background
                        :current-page="pageIndex"
                        :page-size="pageSize"
-                       background
                        layout=" prev, pager, next, jumper"
                        :total="pageTotal">
         </el-pagination>
@@ -54,7 +53,7 @@
         addressInfo: {},//账户信息
         consensusDataLoading: true,//委托类别加载动画
         pageIndex: 1, //页码
-        pageSize: 20, //每页条数
+        pageSize: 10, //每页条数
         pageTotal: 0,//总页数
       };
     },
@@ -100,6 +99,15 @@
       },
 
       /**
+       * 分页功能
+       * @param val
+       **/
+      consensusPages(val) {
+        this.pageIndex = val;
+        this.getNodeDepositByHash(this.pageIndex, this.pageSize, this.addressInfo.address)
+      },
+
+      /**
        * 连接跳转
        * @param name
        */
@@ -108,9 +116,6 @@
         this.$router.push({
           name: name
         })
-      },
-      consensusPages(val) {
-        console.log(`每页 ${val} 条`);
       },
     }
   }
