@@ -1,15 +1,17 @@
 'use strict';
 import {app, protocol, BrowserWindow, ipcMain} from 'electron'
-import {createProtocol,installVueDevtools} from 'vue-cli-plugin-electron-builder/lib'
+import {createProtocol, installVueDevtools} from 'vue-cli-plugin-electron-builder/lib'
 import {autoUpdater} from 'electron-updater'
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 let win;
 protocol.registerStandardSchemes(['app'], {secure: true});
+
 function createWindow() {
-  win = new BrowserWindow({width: 2000, height: 1000,minWidth:1500,minHeight:1000});
+  win = new BrowserWindow({width: 2000, height: 1000, minWidth: 1500, minHeight: 1000});
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
+    if (!process.env.IS_TEST) win.webContents.openDevTools();
   } else {
     createProtocol('app');
     win.loadURL('app://./index.html')
@@ -70,10 +72,11 @@ if (isDevelopment) {
   const uploadUrl = "http://192.168.1.119:8080/"; // 下载地址，不加后面的**.exe
   autoUpdater.setFeedURL(uploadUrl);
   autoUpdater.on('error', function (error) {
-    console.log("检查更新出错:"+error);
+    console.log(error);
     sendUpdateMessage(message.error)
   });
   autoUpdater.on('checking-for-update', function () {
+    console.log("检测版本信息");
     sendUpdateMessage(message.checking)
   });
   autoUpdater.on('update-available', function (info) {
@@ -82,7 +85,8 @@ if (isDevelopment) {
     sendUpdateMessage(message.updateAva)
   });
   autoUpdater.on('update-not-available', function (info) {
-    console.log("现在使用的就是最新版本，不用更新:"+info);
+    console.log("现在使用的就是最新版本，不用更新:");
+    console.log(info);
     sendUpdateMessage(message.updateNotAva)
   });
 
@@ -98,9 +102,9 @@ if (isDevelopment) {
     console.log(updateUrl);
     console.log(quitAndUpdate);
     ipcMain.on('isUpdateNow', (e, arg) => {
-       console.log(e);
-       console.log(arg);
-       console.log(arguments);
+      console.log(e);
+      console.log(arg);
+      console.log(arguments);
       console.log("开始更新");
       //some code here to handle event
       autoUpdater.quitAndInstall();
