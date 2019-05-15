@@ -50,7 +50,10 @@
       </div>
 
       <div class="step_tow w630" v-show="!isFirst">
-        <h3 class="title">您的账户地址：<span>{{newAddressInfo.address}}</span><i class="iconfont icon-fuzhi clicks"></i>
+        <h3 class="title">
+          您的账户地址：
+          <span>{{newAddressInfo.address}}</span>
+          <i class="iconfont iconfuzhi clicks" @click="copy(newAddressInfo.address)"></i>
         </h3>
         <div class="tip bg-gray">
           <p>请勿遗失！ NULS将无法帮助您找回遗失的密钥</p>

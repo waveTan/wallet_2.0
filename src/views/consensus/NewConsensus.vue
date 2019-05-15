@@ -3,7 +3,7 @@
 
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread clicks font14"><i class="el-icon-arrow-left"></i>共识</p>
+        <BackBar backTitle="共识"></BackBar>
         <h3 class="title">创建节点</h3>
       </div>
     </div>
@@ -15,14 +15,15 @@
           </el-input>
         </el-form-item>
         <el-form-item label="奖励地址:" prop="rewardAddress">
-          <el-input v-model.trim="createrForm.rewardAddress">
+          <el-input v-model.trim="createrForm.rewardAddress" maxlength="50">
           </el-input>
         </el-form-item>
         <el-form-item label="出块地址:" prop="blockAddress">
-          <el-input v-model.trim="createrForm.blockAddress">
+          <el-input v-model.trim="createrForm.blockAddress" maxlength="50">
           </el-input>
         </el-form-item>
         <el-form-item label="保证金(NULS):" prop="amount">
+          <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
           <el-input v-model.trim="createrForm.amount">
           </el-input>
         </el-form-item>
@@ -44,6 +45,38 @@
     </div>
     <Password ref="password" @passwordSubmit="passSubmit">
     </Password>
+    <el-dialog title="创建节点确认" :visible.sync="newConsensusVisible" width="40rem" class="confirm-dialog">
+      <div class="bg-white">
+        <div class="div-data">
+          <p>创建地址：</p>
+          <label>{{addressInfo.address}}</label>
+        </div>
+        <div class="div-data">
+          <p>奖励地址：</p>
+          <label>{{createrForm.rewardAddress}}</label>
+        </div>
+        <div class="div-data">
+          <p>打包地址：</p>
+          <label>{{createrForm.blockAddress}}</label>
+        </div>
+        <div class="div-data">
+          <p>佣金比例：</p>
+          <label class="yellow">{{createrForm.rate}}% <span class="fCN">NULS</span></label>
+        </div>
+        <div class="div-data">
+          <p>手续费：</p>
+          <label>0.001 <span class="fCN">NULS</span></label>
+        </div>
+        <div class="div-data">
+          <p>保证金：</p>
+          <label class="yellow">{{createrForm.amount}} <span class="fCN">NULS</span></label>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="newConsensusVisible = false">取 消</el-button>
+        <el-button type="success" @click="confiremSubmit">确认提交</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,9 +85,55 @@
   import {getNulsBalance, inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import {Times} from '@/api/util'
   import Password from '@/components/PasswordBar'
+  import BackBar from '@/components/BackBar'
 
   export default {
     data() {
+      let checkRewardAddress = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入奖励地址'));
+        } else {
+          callback();
+        }
+      };
+      let checkBlockAddress = (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('请输入出块地址'));
+        } else if (value === this.addressInfo.address) {
+          return callback(new Error('打包地址不能为创建地址'));
+        } else {
+          callback();
+        }
+      };
+      let checkAmount = (rule, value, callback) => {
+        let re = /^\d+(?=\.{0,1}\d+$|$)/;
+        let res = /^\d{1,8}(\.\d{1,8})?$/;
+        let balance = this.balanceInfo.balance - value * 100000000;
+        if (!value) {
+          return callback(new Error('请输入保证金'));
+        } else if (!re.exec(value) || !res.exec(value)) {
+          callback(new Error('保证金必须数字值'));
+        } else if (balance < 0.001) {
+          callback(new Error('对不起，余额不足'));
+        } else if (value < 20000 || value > 500000) {
+          callback(new Error('保证金不小于20000并且不大于500000'));
+        } else {
+          callback();
+        }
+      };
+      let checkRate = (rule, value, callback) => {
+        let re = /^\d+(?=\.{0,1}\d+$|$)/;
+        let res = /^\d{1,8}(\.\d{1,8})?$/;
+        if (!value) {
+          return callback(new Error('请输入佣金比例'));
+        } else if (!re.exec(value) || !res.exec(value)) {
+          callback(new Error('佣金比例必须数字值'));
+        } else if (value < 10 || value > 100) {
+          callback(new Error('保证金不小于10并且不大于100'));
+        } else {
+          callback();
+        }
+      };
       return {
         addressInfo: {},//账户信息
         balanceInfo: {},//账户余额信息
@@ -67,18 +146,19 @@
         },
         createrRules: {
           rewardAddress: [
-            {required: true, message: '请输入奖励地址', trigger: 'blur'},
+            {validator: checkRewardAddress, trigger: ['blur', 'change']},
           ],
           blockAddress: [
-            {required: true, message: '请输入出块地址', trigger: 'blur'},
+            {validator: checkBlockAddress, trigger: ['blur', 'change']},
           ],
           amount: [
-            {required: true, message: '请输入保证金', trigger: 'blur'}
+            {validator: checkAmount, trigger: ['blur', 'change']}
           ],
           rate: [
-            {required: true, message: '请输入佣金比例', trigger: 'blur'}
+            {validator: checkRate, trigger: ['blur', 'change']}
           ],
-        }
+        },
+        newConsensusVisible: false,//创建节点确认弹框
       };
     },
     created() {
@@ -88,25 +168,31 @@
       }, 500);
     },
     mounted() {
-
+      this.getBalanceByAddress(this.addressInfo.address)
+    },
+    watch: {
+      addressInfo(val, old) {
+        if (val) {
+          if (val.address !== old.address && old.address) {
+            this.getBalanceByAddress(this.addressInfo.address)
+          }
+        }
+      }
     },
     components: {
       Password,
+      BackBar,
     },
     methods: {
+
+      /**
+       * 创建节点提交
+       * @param formName
+       **/
       async submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            getNulsBalance(this.addressInfo.address).then((response) => {
-              if (response.success) {
-                this.balanceInfo = response.data;
-                this.$refs.password.showPassword(true)
-              } else {
-                this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
-              }
-            }).catch((error) => {
-              this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
-            });
+            this.newConsensusVisible = true;
           } else {
             return false;
           }
@@ -114,11 +200,33 @@
       },
 
       /**
+       * 获取账户余额
+       * @param address
+       **/
+      getBalanceByAddress(address) {
+        getNulsBalance(address).then((response) => {
+          if (response.success) {
+            this.balanceInfo = response.data;
+          } else {
+            this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
+          }
+        }).catch((error) => {
+          this.$message({message: "获取账户余额失败：" + error, type: 'error', duration: 1000});
+        });
+      },
+
+      /**
+       *  确定框确定提交
+       **/
+      confiremSubmit() {
+        this.$refs.password.showPassword(true)
+      },
+
+      /**
        *  获取密码框的密码
        * @param password
        **/
       async passSubmit(password) {
-
         let transferInfo = {
           fromAddress: this.addressInfo.address,
           assetsChainId: 2,
@@ -132,7 +240,7 @@
           let agent = {
             agentAddress: this.addressInfo.address,
             packingAddress: this.createrForm.blockAddress,
-            rewardAddress: this.addressInfo.address,
+            rewardAddress: this.createrForm.rewardAddress,
             commissionRate: Number(this.createrForm.rate),
             deposit: Number(Times(this.createrForm.amount, 100000000).toString())
           };
@@ -150,7 +258,7 @@
               name: "txList"
             })
           } else {
-            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
+            this.$message({message: response.data, type: 'error', duration: 1000});
           }
         }).catch((err) => {
           this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});

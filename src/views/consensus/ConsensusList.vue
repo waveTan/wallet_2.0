@@ -9,7 +9,7 @@
 
     <div class="w1200 mt_20">
       <div class="top_total font12">
-        总委托量：255633 <span class="fCN">NULS</span>
+        总委托量：{{totalAmount}} <span class="fCN">NULS</span>
       </div>
       <el-table :data="consensusData" stripe border v-loading="consensusDataLoading">
         <el-table-column prop="blockHeight" label="高度" align="center">
@@ -46,10 +46,12 @@
   import moment from 'moment'
   import {timesDecimals, getLocalTime, superLong,} from '@/api/util'
   import BackBar from '@/components/BackBar'
+
   export default {
     data() {
       return {
-        consensusData: [],
+        consensusData: [],//委托列表
+        totalAmount: 0,//总委托量
         addressInfo: {},//账户信息
         consensusDataLoading: true,//委托类别加载动画
         pageIndex: 1, //页码
@@ -77,19 +79,21 @@
        * @param hash
        **/
       getNodeDepositByHash(pageIndex, pageSize, address) {
+        this.totalAmount = 0;
         this.$post('/', 'getAccountDeposit', [pageIndex, pageSize, address, ''])
           .then((response) => {
             //console.log(response);
             if (response.hasOwnProperty("result")) {
               for (let itme of response.result.list) {
                 itme.amount = timesDecimals(itme.amount);
-                itme.txHashs = superLong(itme.txHash,20);
+                itme.txHashs = superLong(itme.txHash, 20);
                 itme.createTime = moment(getLocalTime(itme.createTime)).format('YYYY-MM-DD HH:mm:ss');
+                this.totalAmount = this.totalAmount + Number(itme.amount);
               }
               this.consensusData = response.result.list;
               this.pageTotal = response.result.totalCount;
               this.consensusDataLoading = false;
-            }else {
+            } else {
               this.consensusDataLoading = false;
             }
           })
@@ -111,7 +115,7 @@
        * 连接跳转
        * @param name
        */
-      toUrl(name){
+      toUrl(name) {
         //console.log(name)
         this.$router.push({
           name: name

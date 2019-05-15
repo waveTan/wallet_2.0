@@ -16,9 +16,9 @@
                 </el-table-column>
                 <el-table-column prop="state" label="状态" align="center">
                     <template slot-scope="scope">
-            <span @click="editState(scope.$index)">
-              <i class="iconfont click" :class="scope.row.state === 0 ? 'iconduankailianjie' : 'el-icon-check'"></i>
-            </span>
+                        <span @click="editState(scope.$index)">
+                          <i class="iconfont clicks" :class="scope.row.state === 0 ? 'iconduankailianjie flan' : 'iconziyuan fCN'"></i>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" align="center">
@@ -59,9 +59,7 @@
                         </div>
                     </el-form-item>
                     <el-form-item>
-                        <el-radio-group v-model="nodeServiceForm.resource">
-                            <el-radio label="立即使用"></el-radio>
-                        </el-radio-group>
+                        <el-checkbox v-model="nodeServiceForm.resource">立即使用</el-checkbox>
                     </el-form-item>
                     <el-form-item class="btns tc">
                         <el-button @click="resetForm('nodeServiceForm')">取 消</el-button>
@@ -99,8 +97,8 @@
       return {
         loading: false,//切换时加载动画
         defaultData: [
-          {name: '官方', urls: 'http://192.168.1.37:18003/', delay: '10ms', state: 0, isDelete: false},
-          {name: '官方', urls: 'http://192.168.1.192:18003/', delay: '10ms', state: 1, isDelete: false},
+          {name: '官方', urls: 'http://apitn1.nulscan.io/', delay: '10ms', state: 0, isDelete: false},
+          {name: '官方', urls: 'http://apitn2.nulscan.io/', delay: '10ms', state: 1, isDelete: false},
         ],
         //节点列表
         nodeServiceData: [],
@@ -111,7 +109,7 @@
         nodeServiceForm: {
           name: '',
           urls: '',
-          resource: ''
+          resource: false
         },
         //表单验证
         nodeServiceRules: {

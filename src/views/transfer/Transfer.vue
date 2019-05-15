@@ -44,7 +44,7 @@
 
     <Password ref="password" @passwordSubmit="passSubmit">
     </Password>
-    <el-dialog title="转账确认" :visible.sync="transferVisible" width="40rem">
+    <el-dialog title="转账确认" :visible.sync="transferVisible" width="40rem" class="confirm-dialog">
       <div class="bg-white">
         <div class="div-data">
           <p>付款地址：</p>
@@ -279,10 +279,9 @@
        * @param password
        **/
       async passSubmit(password) {
-
         const pri = nuls.decrypteOfAES(this.addressInfo.aesPri, password);
-        const newAddressInfo = nuls.importByKey(2, pri, password);
-        if (newAddressInfo.address === this.addressInfo.address) {
+          const newAddressInfo = nuls.importByKey(2, pri, password);
+          if (newAddressInfo.address === this.addressInfo.address) {
           let transferInfo = {
             fromAddress: this.transferForm.fromAddress,
             toAddress: this.transferForm.toAddress,
@@ -371,39 +370,6 @@
               margin: 10px 0 0 0;
             }
           }
-        }
-      }
-    }
-    .el-dialog__wrapper {
-      .el-dialog__body {
-        padding: 0;
-        .bg-white {
-          padding: 40px 0;
-          .div-data {
-            font-size: 1rem;
-            line-height: 2rem;
-            p {
-              width: 35%;
-              margin: 0;
-              min-height: auto;
-              padding: 0;
-              float: left;
-              text-align: right;
-            }
-            label {
-              width: auto;
-              .fCN {
-                color: #5daf34;
-              }
-            }
-          }
-        }
-
-      }
-      .dialog-footer {
-        padding: 1rem 0;
-        .el-button {
-          width: 200px;
         }
       }
     }

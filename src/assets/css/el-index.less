@@ -111,18 +111,19 @@
     }
   }
 
-  .cell{
-    .tab_bn{
+  .cell {
+    .tab_bn {
 
     }
-    .tab_line{
+    .tab_line {
       color: @Dcolour;
       padding: 0 10px;
     }
   }
 }
-.el-table{
-  td{
+
+.el-table {
+  td {
     padding: 8px 0 !important;
   }
 }
@@ -145,6 +146,9 @@
       .el-form-item__error {
         padding-top: 0;
       }
+      .balance {
+        margin: 10px 0 0 0;
+      }
     }
   }
   .form-next {
@@ -163,8 +167,9 @@
 
   }
 }
-.is-checked{
-  .el-switch__core{
+
+.is-checked {
+  .el-switch__core {
     border-color: @Ncolour !important;
     background-color: @Ncolour !important;
   }
@@ -181,57 +186,57 @@
   }
 }
 
-.btn{
+.btn {
   text-align: center;
-  .el-button--success,.el-button--text,.el-button--info{
+  .el-button--success, .el-button--text, .el-button--info {
     width: 400px;
     margin: 0 auto !important;
   }
 }
 
-.el-dialog{
+.el-dialog {
   background-color: @Bcolour2 !important;
-  .el-dialog__header{
+  .el-dialog__header {
     border-bottom: @BD1;
-    .el-dialog__headerbtn{
+    .el-dialog__headerbtn {
       top: -15px;
       right: -15px;
       background-color: @Bcolour;
       height: 30px;
       width: 30px;
       border-radius: 15px;
-      .el-icon-close{
+      .el-icon-close {
         font-size: 20px;
       }
     }
   }
-  .el-dialog__body{
+  .el-dialog__body {
     padding: 30px 20px 0 20px;
-    span{
+    span {
       color: #c0c4cc;
       font-size: 14px;
     }
-    p{
+    p {
       margin: 20px auto;
       min-height: 80px;
       width: 100%;
-      word-wrap:break-word;
+      word-wrap: break-word;
       padding: 10px;
     }
 
-    .upload{
+    .upload {
       min-height: 100px;
       text-align: center;
-      .upload-tips{
+      .upload-tips {
         text-align: center;
         margin-bottom: 10px;
       }
-      .upload-percent{
+      .upload-percent {
         width: 80%;
-        margin:0 0 20px 10%;
+        margin: 0 0 20px 10%;
       }
-      .upload-bt{
-        .el-button--info{
+      .upload-bt {
+        .el-button--info {
           padding: 10px;
           width: 150px;
           margin-bottom: 20px;
@@ -239,28 +244,63 @@
       }
     }
   }
-  .el-dialog__footer{
+  .el-dialog__footer {
     text-align: center;
-    .el-button--success{
+    .el-button--success {
       width: 400px;
     }
   }
 
 }
 
-.el-radio{
-  .el-radio__input{
+.confirm-dialog {
+  .el-dialog__body {
+    padding: 0;
+    .bg-white {
+      padding: 40px 0;
+      .div-data {
+        font-size: 1rem;
+        line-height: 2rem;
+        p {
+          width: 35%;
+          margin: 0;
+          min-height: auto;
+          padding: 0;
+          float: left;
+          text-align: right;
+        }
+        label {
+          width: auto;
+          .fCN {
+            color: #5daf34;
+          }
+        }
+      }
+    }
+
+  }
+  .dialog-footer {
+    padding: 1rem 0;
+    .el-button {
+      width: 200px;
+    }
+  }
+}
+
+.el-radio {
+  .el-radio__input {
 
   }
   .is-checked {
-    .el-radio__inner{
+    .el-radio__inner {
       border-color: @Ncolour !important;
       background: @Ncolour !important;
     }
   }
 }
-.is-checked{
-  .el-radio__label{
+
+.is-checked {
+  .el-radio__label {
     color: @Ncolour !important;
   }
 }

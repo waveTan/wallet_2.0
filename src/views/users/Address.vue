@@ -177,7 +177,12 @@
        * @param rowInfo
        **/
       addAlias(rowInfo) {
-        this.toUrl('setAlias', rowInfo.address)
+        if(rowInfo.balance  ===0){
+          this.$message({message: "对不起，账户余额不足!", type: 'error', duration: 1000});
+        }else {
+          this.toUrl('setAlias', rowInfo.address)
+        }
+
       },
 
       /**

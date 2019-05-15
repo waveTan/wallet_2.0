@@ -2,7 +2,7 @@
   <div class="new_address bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包管理</p>
+        <BackBar backTitle="地址管理"></BackBar>
         <h3 class="title">设置别名</h3>
       </div>
     </div>
@@ -10,16 +10,23 @@
       <div class="w630">
         <h3 class="tc mzt_20">{{this.$route.query.address}}</h3>
         <div class="tip bg-gray">
-          <p><i></i>请设置密码用以导入账户、转账、参与共识等重要行为验证</p>
-          <p><i></i>请认真保存钱包密码，NULS钱包不存储密码，也无法帮您找回，请务必牢记</p>
+          <p>• 别名可作为NULS转账的收款人，为了账户安全，别名设置确定后，将无法修改，请谨慎操作。</p>
+          <p>• 设置别名需要花费1个NULS</p>
         </div>
         <el-form :model="aliasForm" status-icon :rules="aliasRules" ref="aliasForm" class="mb_20">
           <el-form-item label="别名" prop="alias">
-            <el-input type="text" v-model="aliasForm.alias" autocomplete="off"></el-input>
+            <span class="balance font12 fr">可用余额：{{addressInfo.balance}}</span>
+            <el-input type="text" v-model="aliasForm.alias" maxlength="20" autocomplete="off"></el-input>
           </el-form-item>
+          <div class="div-data font14">
+            手续费: <label>0.001 <span class="fCN">NULS</span></label>
+          </div>
           <el-form-item class="form-next">
             <el-button type="success" @click="submitAliasForm('aliasForm')">下一步</el-button>
           </el-form-item>
+          <div class="tc font18 mzt_20">
+            总花费: 1.001
+          </div>
         </el-form>
       </div>
     </div>
@@ -32,6 +39,7 @@
   import nuls from 'nuls-sdk-js'
   import {inputsOrOutputs, validateAndBroadcast} from '@/api/requestData'
   import Password from '@/components/PasswordBar'
+  import BackBar from '@/components/BackBar'
 
   export default {
     data() {
@@ -60,6 +68,7 @@
     },
     created() {
       this.addressInfo = JSON.parse(localStorage.getItem(this.$route.query.address));
+      this.getNulsBalance(1, this.$route.query.address);
     },
     watch: {
       addressInfo(val, old) {
@@ -70,18 +79,23 @@
     },
     components: {
       Password,
+      BackBar,
     },
     methods: {
 
       /**
-       * 创建地址
+       * 设置别名
        * @param formName
        */
       submitAliasForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.getNulsBalance(1, this.$route.query.address);
-            this.$refs.password.showPassword(true);
+            //console.log(this.balanceInfo.balance);
+            if(this.balanceInfo.balance > 100100000){
+              this.$refs.password.showPassword(true);
+            }else {
+              this.$message({message: "对不起，获取账户余额不足!", type: 'error', duration: 1000});
+            }
           } else {
             return false;
           }
@@ -99,7 +113,7 @@
             //console.log(response);
             if (response.hasOwnProperty("result")) {
               this.balanceInfo = {'balance': response.result.balance, 'nonce': response.result.nonce};
-              this.$refs.password.showPassword(true);
+              //this.$refs.password.showPassword(true);
             } else {
               this.$message({message: "获取账户余额失败:" + response, type: 'error', duration: 1000});
             }
@@ -114,32 +128,39 @@
        * @param password
        **/
       async passSubmit(password) {
-        let transferInfo = {
-          fromAddress: this.addressInfo.address,
-          toAddress: 'tNULSeBaMkqeHbTxwKqyquFcbewVTUDHPkF11o',
-          assetsChainId: 2,
-          assetsId: 1,
-          amount: 100000000,
-          fee: 100000
-        };
-        let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 3);
-        let aliasInfo = {
-          fromAddress: this.addressInfo.address,
-          alias: this.aliasForm.alias
-        };
-        let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 3, aliasInfo);
-        let txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
-        //console.log(txhex);
-        //验证并广播交易
-        await validateAndBroadcast(txhex).then((response) => {
-          if (response.success) {
-            this.toUrl("txList");
-          } else {
-            this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
-          }
-        }).catch((err) => {
-          this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
-        });
+
+        const pri = nuls.decrypteOfAES(this.addressInfo.aesPri, password);
+        const newAddressInfo = nuls.importByKey(2, pri, password);
+        if (newAddressInfo.address === this.addressInfo.address) {
+          let transferInfo = {
+            fromAddress: this.addressInfo.address,
+            toAddress: 'tNULSeBaMkqeHbTxwKqyquFcbewVTUDHPkF11o',
+            assetsChainId: 2,
+            assetsId: 1,
+            amount: 100000000,
+            fee: 100000
+          };
+          let inOrOutputs = await inputsOrOutputs(transferInfo, this.balanceInfo, 3);
+          let aliasInfo = {
+            fromAddress: this.addressInfo.address,
+            alias: this.aliasForm.alias
+          };
+          let tAssemble = await nuls.transactionAssemble(inOrOutputs.data.inputs, inOrOutputs.data.outputs, '', 3, aliasInfo);
+          let txhex = await nuls.transactionSerialize(nuls.decrypteOfAES(this.addressInfo.aesPri, password), this.addressInfo.pub, tAssemble);
+          //console.log(txhex);
+          //验证并广播交易
+          await validateAndBroadcast(txhex).then((response) => {
+            if (response.success) {
+              this.toUrl("txList");
+            } else {
+              this.$message({message: "验证并广播交易错误：" + response.data, type: 'error', duration: 1000});
+            }
+          }).catch((err) => {
+            this.$message({message: "验证并广播交易异常：" + err, type: 'error', duration: 1000});
+          });
+        }else {
+          this.$message({message: "对不起，密码错误", type: 'error', duration: 1000});
+        }
       },
 
       /**
@@ -158,9 +179,9 @@
 
 <style lang="less">
   @import "./../../assets/css/style";
-
   .new_address {
     .new {
+      min-height: 600px;
       border: @BD1;
       .step {
         height: 50px;

@@ -35,7 +35,7 @@
                         <el-menu-item index="nodeService" class="tc">服务节点</el-menu-item>
                         <el-menu-item index="address" class="tc" disabled>通讯录</el-menu-item>
                     </el-submenu>
-                    <el-submenu index="lang">
+                    <el-submenu index="lang" disabled>
                         <template slot="title">{{this.lang ==="en" ? "Eng":"中文"}}</template>
                         <el-menu-item index="cn">中文</el-menu-item>
                         <el-menu-item index="en">English</el-menu-item>

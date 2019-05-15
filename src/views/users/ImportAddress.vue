@@ -2,7 +2,7 @@
   <div class="import_address bg-gray">
     <div class="bg-white">
       <div class="w1200">
-        <p class="bread  clicks font14"><i class="el-icon-arrow-left"></i>钱包管理</p>
+        <BackBar backTitle="创建地址"></BackBar>
         <h3 class="title">导入钱包</h3>
       </div>
     </div>
@@ -38,6 +38,7 @@
 
 <script>
   import nuls from 'nuls-sdk-js'
+  import BackBar from '@/components/BackBar'
 
   export default {
     data() {
@@ -89,6 +90,9 @@
           ]
         }
       };
+    },
+    components: {
+      BackBar
     },
     methods: {
 
